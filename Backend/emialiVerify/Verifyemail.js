@@ -23,3 +23,4 @@ export const verifyEmail = (token, email) => {
     console.log(info);
   });
 };
+
