@@ -5,7 +5,6 @@ import { verifyEmail } from "../emialiVerify/Verifyemail.js";
 import bcrypt from "bcryptjs";
 import { Session } from "../models/sessionModel.js";
 import { sendOTPMail } from "../emialiVerify/sendOTPMail.js";
-import { use } from "react";
 
 export const register = async (req, res) => {
   try {
