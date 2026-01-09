@@ -5,6 +5,7 @@ import { verifyEmail } from "../emialiVerify/Verifyemail.js";
 import bcrypt from "bcryptjs";
 import { Session } from "../models/sessionModel.js";
 import { sendOTPMail } from "../emialiVerify/sendOTPMail.js";
+import { use } from "react";
 
 export const register = async (req, res) => {
   try {
@@ -357,3 +358,41 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
+
+export const allUser = async(req,res)=>{
+  try {
+    const users = await User.find()
+    res.status(200).json({
+      success:true,
+      users
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
+
+export const getUserById =async(req,res)=>{
+  try {
+    const {userId}= req.params;//userid extract via params
+    const user =await User.findById(userId).select("-password -otp -otpExpiry -token")
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:'User not found'
+      })
+    }
+    res.status(200).json({
+      success:true,
+      user,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
