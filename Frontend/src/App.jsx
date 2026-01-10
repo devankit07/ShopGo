@@ -1,8 +1,7 @@
-import { Button } from "./components/ui/button";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Navbar from "./components/ui/Navbar";
 import Home from "./pages/Home";
-import Signup from "./pages/Signup";
+import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login";
 
 const router = createBrowserRouter([

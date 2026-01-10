@@ -1,5 +1,5 @@
 import { User } from "../models/userModel.js";
-import brcyptjs from "bcryptjs";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { verifyEmail } from "../emialiVerify/Verifyemail.js";
 import bcrypt from "bcryptjs";
@@ -9,20 +9,25 @@ import { sendOTPMail } from "../emialiVerify/sendOTPMail.js";
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+
     if (!firstName || !lastName || !email || !password) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
+
     const user = await User.findOne({ email });
+
     if (user) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: "User already exits",
+        message: "User already exists",
       });
     }
-    const hashedpassword = await brcyptjs.hash(password, 10);
+
+    const hashedpassword = await bcryptjs.hash(password, 10);
+
     const newUser = await User.create({
       firstName,
       lastName,
@@ -31,18 +36,20 @@ export const register = async (req, res) => {
     });
 
     const Token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
-      expiresIn: "10M",
+      expiresIn: "10m",
     });
+
     verifyEmail(Token, email);
     newUser.token = Token;
     await newUser.save();
+
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
       user: newUser,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
@@ -337,18 +344,17 @@ export const changePassword = async (req, res) => {
       });
     }
 
-  
-
     const hashedpassword = await bcrypt.hash(newpassword, 10);
     user.password = hashedpassword;
-    
-    user.isLoggedIn = false; 
+
+    user.isLoggedIn = false;
 
     await user.save();
 
     return res.status(200).json({
       success: true,
-      message: "Password changed successfully. Please login with your new password.",
+      message:
+        "Password changed successfully. Please login with your new password.",
     });
   } catch (error) {
     res.status(500).json({
@@ -358,40 +364,41 @@ export const changePassword = async (req, res) => {
   }
 };
 
-
-export const allUser = async(req,res)=>{
+export const allUser = async (req, res) => {
   try {
-    const users = await User.find()
+    const users = await User.find();
     res.status(200).json({
-      success:true,
-      users
-    })
+      success: true,
+      users,
+    });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:error.message
-    })
+      success: false,
+      message: error.message,
+    });
   }
-}
+};
 
-export const getUserById =async(req,res)=>{
+export const getUserById = async (req, res) => {
   try {
-    const {userId}= req.params;//userid extract via params
-    const user =await User.findById(userId).select("-password -otp -otpExpiry -token")
-    if(!user){
+    const { userId } = req.params; //userid extract via params
+    const user = await User.findById(userId).select(
+      "-password -otp -otpExpiry -token"
+    );
+    if (!user) {
       return res.status(400).json({
-        success:false,
-        message:'User not found'
-      })
+        success: false,
+        message: "User not found",
+      });
     }
     res.status(200).json({
-      success:true,
+      success: true,
       user,
-    })
+    });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message:error.message
-    })
+      success: false,
+      message: error.message,
+    });
   }
-}
+};
