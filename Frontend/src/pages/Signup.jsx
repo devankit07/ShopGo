@@ -24,7 +24,7 @@ const Signup = () => {
     email: "",
     password: "",
   });
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setformdata((prev) => ({
@@ -32,41 +32,49 @@ const Signup = () => {
       [name]: value,
     }));
   };
- const submithandler = async (e) => {
+  const submithandler = async (e) => {
     e.preventDefault();
-    console.log(formdata)
+    console.log(formdata);
     try {
-      setloading(true)
-      const res = await axios.post(`http://localhost:8000/api/v1/user/register`, formdata);
-      
+      setloading(true);
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/user/register`,
+        formdata
+      );
+
       if (res.data.success) {
         toast.success(res.data.message);
-        navigate('/verify');
+        navigate("/verify");
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message );
-    } finally{
-      setloading(false)
+      toast.error(error.response?.data?.message);
+    } finally {
+      setloading(false);
     }
   };
   return (
-    <div className="flex justify-center items-center min-h-screen bg-pink-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
+    <div className="flex justify-center items-center min-h-screen bg-[#dbdfe4] p-4">
+      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-gray-100">
+        <CardHeader className="text-center space-y-1">
+          <CardTitle className="text-2xl font-extrabold text-[#3E4152]">
             Create an account
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-[#7E818C]">
             Enter your details below to create your ShopGo account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form onSubmit={submithandler} className="grid gap-5">
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label
+                  htmlFor="firstName"
+                  className="text-sm font-semibold text-[#3E4152]"
+                >
+                  First Name
+                </Label>
                 <Input
                   id="firstName"
                   name="firstName"
@@ -75,10 +83,16 @@ const Signup = () => {
                   required
                   value={formdata.firstName}
                   onChange={handleChange}
+                  className="border-gray-300 focus-visible:ring-[#FF3F6C] h-11"
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label
+                  htmlFor="lastName"
+                  className="text-sm font-semibold text-[#3E4152]"
+                >
+                  Last Name
+                </Label>
                 <Input
                   id="lastName"
                   name="lastName"
@@ -87,13 +101,19 @@ const Signup = () => {
                   required
                   value={formdata.lastName}
                   onChange={handleChange}
+                  className="border-gray-300 focus-visible:ring-[#FF3F6C] h-11"
                 />
               </div>
             </div>
 
             {/* Email Row */}
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label
+                htmlFor="email"
+                className="text-sm font-semibold text-[#3E4152]"
+              >
+                Email
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -102,14 +122,19 @@ const Signup = () => {
                 required
                 value={formdata.email}
                 onChange={handleChange}
+                className="border-gray-300 focus-visible:ring-[#FF3F6C] h-11"
               />
             </div>
 
             {/* Password Row */}
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
+              <Label
+                htmlFor="password"
+                title="password"
+                className="text-sm font-semibold text-[#3E4152]"
+              >
+                Password
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -119,37 +144,41 @@ const Signup = () => {
                   type={showpassword ? "text" : "password"}
                   value={formdata.password}
                   onChange={handleChange}
+                  className="border-gray-300 focus-visible:ring-[#FF3F6C] h-11"
                 />
-                {showpassword ? (
-                  <EyeOff
-                    onClick={() => {
-                      setshowpassword(false);
-                    }}
-                    className="w-5 h-5 text-gray-700 absolute right-5 bottom-2"
-                  />
-                ) : (
-                  <Eye
-                    onClick={() => {
-                      setshowpassword(true);
-                    }}
-                    className="w-5 h-5 text-gray-700 absolute right-5 bottom-2"
-                  />
-                )}
+                <div
+                  className="absolute right-3 top-3 cursor-pointer text-gray-400 hover:text-[#FF3F6C]"
+                  onClick={() => setshowpassword(!showpassword)}
+                >
+                  {showpassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </div>
               </div>
             </div>
-          </div>
+
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full h-11 mt-2 bg-[#FF3F6C] hover:bg-[#e0355f] text-white font-bold rounded-md transition-all active:scale-[0.98]"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Verifying Details...
+                </>
+              ) : (
+                "SIGN UP"
+              )}
+            </Button>
+          </form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button onClick={submithandler} type="submit" className="w-full cursor-pointer bg-pink-500 hover:bg-pink-600">
-            {loading?<><Loader2 className="w-4 h-4 animate-spin mr-2"/>please wait</>:'Signup'} 
-          </Button>
-          <p className="gap-2 flex">
-            Already have an account
+        <CardFooter className="flex flex-col gap-4 border-t border-gray-50 pt-6">
+          <p className="text-sm text-[#7E818C] text-center">
+            Already have an account?
             <Link
-              className="hover:underline cursor-pointer text-pink-800"
+              className="font-bold text-[#FF3F6C] hover:underline"
               to={"/login"}
             >
-              Login
+              LOG IN
             </Link>
           </p>
         </CardFooter>
