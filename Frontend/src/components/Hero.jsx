@@ -20,7 +20,7 @@ const Hero = () => {
 
   return (
     
-    <section className="bg-gradient-to-r from-yellow-500 to-purple-700 text-white py-16">
+    <section className="bg-gradient-to-r from-yellow-500 to-purple-700 text-white pt-24 pb-16 md:pt-32 md:pb-20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           

@@ -88,7 +88,7 @@ const Footer = () => {
       <div className="mt-16 border-t border-gray-700/50 pt-8 text-center text-[12px] tracking-widest uppercase">
         <p>
           &copy; {new Date().getFullYear()}{" "}
-          <span className="text-[#FF3F6C] font-bold">ShopGo</span>. Premium Electronics Store.
+          <span className="text-[#FF3F6C] font-bold">ShopGo</span>. All rights reserved.
         </p>
       </div>
     </footer>
