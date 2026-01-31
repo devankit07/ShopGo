@@ -9,40 +9,63 @@ import Profile from "./components/Profile";
 
 const router = createBrowserRouter([
   {
-    path:'/',
-    element:<><Navbar/><Home/></>
-  },
-    {
-    path:'/signup',
-    element:<><Signup/></>
-  },
-    {
-    path:'/login',
-    element:<><Login/></>
-  },
-   {
-    path:'/verify',
-    element:<><Verify/></>
-  },
-   {
-    path:'/verify/:token',
-    element:<><VerifyEmail/></>
+    path: "/",
+    element: (
+      <>
+        <Navbar />
+        <Home />
+      </>
+    ),
   },
   {
-    path:'/profile',
-    element:<><Navbar/><Profile/></>
+    path: "/signup",
+    element: (
+      <>
+        <Signup />
+      </>
+    ),
   },
-  
-  
-])
-
+  {
+    path: "/login",
+    element: (
+      <>
+        <Login />
+      </>
+    ),
+  },
+  {
+    path: "/verify",
+    element: (
+      <>
+        <Verify />
+      </>
+    ),
+  },
+  {
+    path: "/verify/:token",
+    element: (
+      <>
+        <VerifyEmail />
+      </>
+    ),
+  },
+  {
+    path: "/profile/:userId",
+    element: (
+      <>
+        <Navbar />
+        <Profile />
+      </>
+    ),
+  },
+]);
 
 const App = () => {
   return (
-  <>
-  <RouterProvider router={router}/>
-  </>
-  )
-}
+    <>
+      <RouterProvider router={router} />
+    </>
+  );
+};
 
-export default App
+export default App;

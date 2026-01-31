@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { User, Package, Camera } from "lucide-react" 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,8 +16,43 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { useParams } from "react-router-dom"
+import { useSelector } from "react-redux"
+
 
 const Profile = () => {
+const {user} = useSelector(store=>store.user)
+ const params = useParams()
+ const userId = params.userId
+const [updateUser, setUpdateUser] = useState({
+  firstName:user?.firstName,
+  lastName:user?.lastName,
+  phoneNo:user?.phoneNo,
+  address:user?.address,
+  city:user?.city,
+  ZipCode:user?.ZipCode,
+  email:user?.email,
+  profilepic:user?.profilepic,
+  role:user?.role
+})
+
+const [ file, setFile ] = useState(null);
+const handlechange = (e)=>{
+  setUpdateUser({...updateUser, [e.target.name]:e.target.value})
+}
+
+const handlefilechange = (e)=>{
+ const selectedFile = e.target.files[0];
+  setFile(selectedFile);
+  setUpdateUser({...updateUser, profilepic:URL.createObjectURL(selectedFile)}) // Preview ke liye temporary URL
+}
+
+const handlesubmit = (e)=>{
+  e.preventDefault();
+  console.log(updateUser);
+}
+
+  
   return (
     <div className='pt-28 pb-10 min-h-screen bg-[#dbdfe4] px-4'>
       <Tabs defaultValue="profile" className="max-w-4xl mx-auto">

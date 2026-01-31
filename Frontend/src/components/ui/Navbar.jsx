@@ -23,7 +23,7 @@ const Navbar = () => {
           headers: {
             Authorization: `Bearer ${accesstoken}`,
           },
-        }
+        },
       );
       if (response.data.success) {
         dispatch(setUser(null));
@@ -66,7 +66,7 @@ const Navbar = () => {
 
             {user && (
               <Link
-                to="/profile"
+                to={`/profile/${user._id}`} 
                 className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-1.5 rounded-full hover:bg-gray-100 transition-colors shadow-sm"
               >
                 <div className="w-6 h-6 bg-[#FF3F6C] rounded-full flex items-center justify-center text-[10px] text-white">

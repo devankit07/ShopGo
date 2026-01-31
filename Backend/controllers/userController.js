@@ -5,6 +5,8 @@ import { verifyEmail } from "../emialiVerify/Verifyemail.js";
 import bcrypt from "bcryptjs";
 import { Session } from "../models/sessionModel.js";
 import { sendOTPMail } from "../emialiVerify/sendOTPMail.js";
+import cloudinary from "../utils/cloudinary.js";
+
 
 export const register = async (req, res) => {
   try {
@@ -159,7 +161,7 @@ export const login = async (req, res) => {
 
     const ispasswordValid = await bcrypt.compare(
       password,
-      existinguser.password
+      existinguser.password,
     );
     if (!ispasswordValid) {
       return res.status(401).json({
@@ -179,12 +181,12 @@ export const login = async (req, res) => {
     const accesstoken = jwt.sign(
       { id: existinguser._id },
       process.env.SECRET_KEY,
-      { expiresIn: "10d" }
+      { expiresIn: "10d" },
     );
     const refreshtoken = jwt.sign(
       { id: existinguser._id },
       process.env.SECRET_KEY,
-      { expiresIn: "30d" }
+      { expiresIn: "30d" },
     );
 
     // Session Management
@@ -383,7 +385,7 @@ export const getUserById = async (req, res) => {
   try {
     const { userId } = req.params; //userid extract via params
     const user = await User.findById(userId).select(
-      "-password -otp -otpExpiry -token"
+      "-password -otp -otpExpiry -token",
     );
     if (!user) {
       return res.status(400).json({
@@ -395,6 +397,86 @@ export const getUserById = async (req, res) => {
       success: true,
       user,
     });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateuser = async (req, res) => {
+  try {
+    const useridToUpdate = req.params.id; // user id for update
+    const loggeInUser = req.user; // from isauthenticated middleware
+    const { firstName, lastName, phoneNo, address, city, ZipCode, role } =
+      req.body;
+
+    if (
+      loggeInUser._id.toString() !== useridToUpdate &&
+      loggeInUser.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this profile",
+      });
+    }
+    let user = await User.findById(useridToUpdate);
+
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "user not found",
+      });
+    }
+
+    let profilePicUrl = user.profilePic;
+    let profilePicPublicId = user.profilePicPublicId;
+
+    if (req.file) {
+      if (profilePicPublicId) {
+        await cloudinary.uploader.destroy(profilePicPublicId);
+      }
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "profiles" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          },
+        );
+        stream.end(req.file.buffer);
+      });
+
+      profilePicUrl = uploadResult.secure_url;
+      profilePicPublicId = uploadResult.public_id;
+    }
+    // update fields
+    user.firstName = firstName || firstName;
+    user.lastName = lastName || lastName;
+    user.address = address || address;
+    user.city = city || city;
+    user.ZipCode = ZipCode || ZipCode;
+    user.phoneNo = phoneNo || phoneNo;
+    user.role = role;
+    user.profilePic = profilePicUrl;
+    user.profilePicPublicId = profilePicPublicId;
+
+
+    const updatedUser = await user.save()
+
+    return res.status(200).json(
+      {
+        success:true,
+
+        message:"profile updated successfully",
+        user: updatedUser
+      }
+    )
+
+
+
   } catch (error) {
     return res.status(500).json({
       success: false,
