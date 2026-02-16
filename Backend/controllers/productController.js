@@ -11,7 +11,7 @@ export const addProduct = async (req, res) => {
             return res.status(400).json({ message: "All fields are required" });   
         }
 
-        // //handle mulltiple img
+         //handle mulltiple img
         let productImage = []; 
         if(req.files && req.files.length > 0) {
             for (let file of req.files) {
