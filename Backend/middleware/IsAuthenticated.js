@@ -49,6 +49,26 @@ export const IsAuthenticated = async (req, res, next) => {
 };
 
 
+/** Optional auth: sets req.user and req.id if valid token present; otherwise continues without them */
+export const OptionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return next();
+    }
+    const token = authHeader.split(" ")[1];
+    const decoded = Jwt.verify(token, process.env.SECRET_KEY);
+    const user = await User.findById(decoded.id);
+    if (user) {
+      req.user = user;
+      req.id = user._id;
+    }
+    next();
+  } catch {
+    next();
+  }
+};
+
 export const isAdmin = (req,res,next)=>{
   if(req.user && req.user.role === 'admin'){
     next()

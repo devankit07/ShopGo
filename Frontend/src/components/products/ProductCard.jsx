@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
@@ -14,48 +15,58 @@ export default function ProductCard({ product }) {
   const price = product.productPrice ?? product.price;
   const imageUrl =
     product.productImage?.[0]?.url || product.imageUrl || PLACEHOLDER_IMG;
+  const productId = product._id;
+
+  const handleAddToCartClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setModalOpen(true);
+  };
 
   return (
     <>
-      <Card
-        className={cn(
-          "group overflow-hidden rounded-2xl border border-border bg-card shadow-md",
-          "transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl"
-        )}
-      >
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          <img
-            src={imageUrl}
-            alt={name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
-        <CardContent className="flex flex-1 flex-col gap-2 p-4">
-          <h3 className="line-clamp-2 font-semibold text-foreground">{name}</h3>
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            {description}
-          </p>
-          <p className="mt-auto text-lg font-bold text-[#FF3F6C]">
-            ₹{Number(price).toLocaleString()}
-          </p>
-        </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <Button
-            onClick={() => setModalOpen(true)}
-            className="w-full rounded-xl bg-[#FF3F6C] font-semibold text-white hover:bg-[#e0355f]"
-          >
-            <ShoppingCart className="mr-2 size-4" />
-            Add To Cart
-          </Button>
-        </CardFooter>
-      </Card>
+      <Link to={`/product/${productId}`} className="block">
+        <Card
+          className={cn(
+            "group h-full overflow-hidden rounded-2xl border border-border bg-card shadow-md",
+            "transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl"
+          )}
+        >
+          <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+            <img
+              src={imageUrl}
+              alt={name}
+              className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-110"
+            />
+          </div>
+          <CardContent className="flex flex-1 flex-col gap-1.5 p-3">
+            <h3 className="line-clamp-1 font-semibold text-foreground text-sm">{name}</h3>
+            <p className="line-clamp-1 text-xs text-muted-foreground">
+              {description}
+            </p>
+            <p className="mt-auto text-base font-bold text-[#FF3F6C]">
+              ₹{Number(price).toLocaleString()}
+            </p>
+          </CardContent>
+          <CardFooter className="p-3 pt-0" onClick={(e) => e.preventDefault()}>
+            <Button
+              size="sm"
+              onClick={handleAddToCartClick}
+              className="w-full rounded-xl bg-[#FF3F6C] font-semibold text-white hover:bg-[#e0355f]"
+            >
+              <ShoppingCart className="mr-2 size-4" />
+              Add To Cart
+            </Button>
+          </CardFooter>
+        </Card>
+      </Link>
 
       <AddToCartModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         product={{
-          _id: product._id,
-          productId: product._id,
+          _id: productId,
+          productId,
           name,
           price,
           image: imageUrl,

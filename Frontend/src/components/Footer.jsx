@@ -1,95 +1,103 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaPinterestP,
-  FaTwitter,
-} from "react-icons/fa";
+
+const QUICK_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/products", label: "Products" },
+  { to: "/cart", label: "Orders" },
+  { to: "/login", label: "Account" },
+];
+
+const CUSTOMER_SUPPORT = [
+  { label: "Help Center", href: "#" },
+  { label: "Shipping Info", href: "#" },
+  { label: "Returns Policy", href: "#" },
+  { label: "Contact", href: "#" },
+];
+
+const CATEGORIES = [
+  { label: "Electronics", to: "/products?category=electronics" },
+  { label: "Electric Vehicles", to: "/products?category=electric-vehicles" },
+  { label: "Jewellery", to: "/products?category=jewellery" },
+  { label: "Accessories", to: "/products?category=accessories" },
+];
 
 const Footer = () => {
   return (
-    <footer className="bg-[#282c3f] text-gray-400 py-5">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer className="bg-[#262a30] text-gray-400">
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          {/* Logo + description */}
+          <div className="sm:col-span-2 lg:col-span-1 flex flex-col">
+            <Link to="/" className="inline-block transition-transform hover:scale-[1.02] mb-4">
+              <img src="/icon.png" alt="SHOP-GO" className="h-10 w-auto object-contain" />
+            </Link>
+            <p className="text-sm leading-relaxed max-w-xs">
+              Your trusted destination for electronics, lifestyle products, and more. Quality, value, and fast delivery—every time.
+            </p>
+          </div>
 
-        {/* 1. Info Section */}
-        <div className="space-y-4">
-          <Link to="/" className="inline-block transition-transform hover:scale-[1.02]">
-            <img src="/icon.png" alt="SHOP-GO" className="h-10 w-auto object-contain" />
+          {/* Quick Links */}
+          <div className="flex flex-col">
+            <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-4">
+              Quick Links
+            </h3>
+            <ul className="space-y-3 text-sm">
+              {QUICK_LINKS.map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-teal-400 transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Customer Support */}
+          <div className="flex flex-col">
+            <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-4">
+              Customer Support
+            </h3>
+            <ul className="space-y-3 text-sm">
+              {CUSTOMER_SUPPORT.map(({ label, href }) => (
+                <li key={label}>
+                  <a href={href} className="hover:text-teal-400 transition-colors">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Categories */}
+          <div className="flex flex-col">
+            <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-4">
+              Categories
+            </h3>
+            <ul className="space-y-3 text-sm">
+              {CATEGORIES.map(({ label, to }) => (
+                <li key={label}>
+                  <Link to={to} className="hover:text-teal-400 transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom row: copyright + view feedback link */}
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-gray-500 tracking-widest uppercase">
+            © 2026 <span className="font-bold text-teal-400">SHOP-GO</span>. All rights reserved.
+          </p>
+          <Link
+            to="/give-feedback"
+            className="inline-flex items-center justify-center h-10 px-5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition-colors shrink-0"
+          >
+            Give Feedback
           </Link>
-          <p className="text-sm leading-relaxed">
-            Powering Your World with the Best in Electronics. High-quality gadgets at unbeatable prices.
-          </p>
-          <div className="text-sm space-y-1">
-            <p>Style City, NY 10001</p>
-            <p className="text-white font-medium">support@shopgo.com</p>
-          </div>
         </div>
-
-        {/* 2. Customer Service */}
-        <div>
-          <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-6">
-            Customer Service
-          </h3>
-          <ul className="space-y-3 text-sm">
-            {["Contact Us", "Shipping & Returns", "FAQs", "Order Tracking"].map((item) => (
-              <li key={item} className="hover:text-[var(--brand-accent)] cursor-pointer transition-colors w-max">
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* 3. Social Media */}
-        <div>
-          <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-6">Follow Us</h3>
-          <div className="flex space-x-5 text-lg">
-            {[
-              { icon: <FaFacebookF />, color: "hover:bg-[#1877F2]" },
-              { icon: <FaInstagram />, color: "hover:bg-[#E4405F]" },
-              { icon: <FaTwitter />, color: "hover:bg-[#1DA1F2]" },
-              { icon: <FaPinterestP />, color: "hover:bg-[#E60023]" },
-            ].map((social, index) => (
-              <div 
-                key={index} 
-                className={`w-10 h-10 border border-gray-600 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ${social.color} hover:text-white hover:border-transparent`}
-              >
-                {social.icon}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 4. Newsletter */}
-        <div className="space-y-4">
-          <h3 className="text-white font-bold uppercase tracking-wider text-sm mb-2">
-            Stay in the Loop
-          </h3>
-          <p className="text-xs leading-relaxed">
-            Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
-          </p>
-          <form className="flex mt-4">
-            <input
-              type="email"
-              placeholder="Email address"
-              className="w-full bg-[#3e4152] border-none p-3 rounded-l-md text-white text-sm outline-none focus:ring-1 focus:ring-[var(--brand-accent)]"
-            />
-            <button
-              type="submit"
-              className="bg-[var(--brand-accent)] px-5 rounded-r-md text-white font-bold text-sm hover:opacity-90 transition-all active:scale-95"
-            >
-              Join
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="mt-16 border-t border-gray-700/50 pt-8 text-center text-[12px] tracking-widest uppercase">
-        <p>
-          &copy; {new Date().getFullYear()}{" "}
-          <span className="font-bold text-[var(--brand-accent)]">SHOP-GO</span>. All rights reserved.
-        </p>
       </div>
     </footer>
   );

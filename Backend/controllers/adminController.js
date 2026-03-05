@@ -246,62 +246,6 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-export const getReports = async (req, res) => {
-  try {
-    const orders = await Order.find().populate("userId", "firstName lastName email").lean();
-    const productSales = {};
-    const userActivity = {};
-
-    orders.forEach((o) => {
-      const uid = o.userId?._id?.toString() || o.userId?.toString();
-      userActivity[uid] = (userActivity[uid] || 0) + 1;
-      (o.products || []).forEach((p) => {
-        const pid = p.productId?.toString() || "unknown";
-        productSales[pid] = (productSales[pid] || 0) + (p.quantity || 1);
-      });
-    });
-
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
-    let totalCost = 0;
-    orders.forEach((o) => {
-      (o.products || []).forEach((p) => {
-        totalCost += (p.cost !== undefined ? p.cost : 0) * (p.quantity || 1);
-      });
-    });
-    const totalProfit = totalRevenue - totalCost;
-
-    const topProducts = await Promise.all(
-      Object.entries(productSales)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(async ([pid, qty]) => {
-          if (pid === "unknown") return { productName: "Unknown", quantity: qty };
-          const p = await Product.findById(pid).select("productName").lean();
-          return { productName: p?.productName || "Unknown", quantity: qty };
-        })
-    );
-
-    const users = await User.find().select("firstName lastName email").lean();
-    const mostActiveUsers = users
-      .map((u) => ({
-        ...u,
-        orderCount: userActivity[u._id.toString()] || 0,
-      }))
-      .sort((a, b) => b.orderCount - a.orderCount)
-      .slice(0, 10);
-
-    return res.status(200).json({
-      success: true,
-      totalSalesReport: { totalOrders: orders.length, totalRevenue, totalProfit, totalLoss: totalCost > totalRevenue ? totalCost - totalRevenue : 0 },
-      profitLossReport: { totalRevenue, totalCost, totalProfit, totalLoss: totalProfit < 0 ? Math.abs(totalProfit) : 0 },
-      topSellingProducts: topProducts,
-      mostActiveUsers,
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 export const getActionLogs = async (req, res) => {
   try {
     const logs = await AdminActionLog.find()

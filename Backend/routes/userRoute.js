@@ -7,20 +7,21 @@ import {
   login,
   logout,
   register,
-  reVerify,
+  resendLoginOtp,
   updateuser,
-  verify,
+  verifyLoginOtp,
   verifyotp,
 } from "../controllers/userController.js";
 import { isAdmin, IsAuthenticated } from "../middleware/IsAuthenticated.js";
+import { verifyPendingLoginToken } from "../middleware/verifyPendingLoginToken.js";
 import { singleUpload } from "../middleware/multer.js";
 
 const router = express.Router();
 
 router.post("/register", register);
-router.post("/verify", verify);
-router.post("/reverify", reVerify);
 router.post("/login", login);
+router.post("/verify-login-otp", verifyPendingLoginToken, verifyLoginOtp);
+router.post("/resend-login-otp", verifyPendingLoginToken, resendLoginOtp);
 router.post("/logout", IsAuthenticated, logout);
 router.post("/forgot-password", IsAuthenticated, forgotPassword);
 router.post("/verify-otp/:email", verifyotp);

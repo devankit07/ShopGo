@@ -14,9 +14,6 @@ export const adminApi = {
   getAnalytics: () =>
     axios.get(`${API_BASE}/analytics`, { headers: getAuthHeaders() }),
 
-  getReports: () =>
-    axios.get(`${API_BASE}/reports`, { headers: getAuthHeaders() }),
-
   getLogs: () =>
     axios.get(`${API_BASE}/logs`, { headers: getAuthHeaders() }),
 

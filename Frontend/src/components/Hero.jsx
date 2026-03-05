@@ -1,75 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 
 const Hero = () => {
-  const images = [
-    "/hero.avif",
-    "/hero1.avif", 
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
- 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 4000); 
-
-    return () => clearInterval(timer); 
-  }, [images.length]);
-
   return (
-    
-    <section className="bg-gradient-to-r from-yellow-500 to-purple-700 text-white pt-24 pb-16 md:pt-32 md:pb-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          
-          {/* Text Section */}
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-              Latest Items at <br /> 
-              <span className="text-yellow-300">Best Prices</span>
-            </h1>
-            <p className="text-xl text-pink-50 leading-relaxed max-w-lg">
-              Discover cutting-edge technology with unbeatable deals and
-              exclusive offers on Smart gadgets & accessories.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button className='bg-white text-[#FF3F6C] hover:bg-gray-100 font-bold h-12 px-8 shadow-lg'>
-                Shop Now
-              </Button>
-              <Button variant="outline" className='border-2 border-white text-white hover:bg-white hover:text-[#FF3F6C] bg-transparent font-bold h-12 px-8'>
-                View Deals
-              </Button>
-            </div>
-          </div>
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#262a30] pt-24 pb-16 md:pt-28 md:pb-20">
+      {/* Animated gradient glow background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-teal-500/20 via-transparent to-transparent rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-orange-500/15 via-transparent to-transparent rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-3xl animate-float" />
+      </div>
 
-          {/* Slider Image Section */}
-          <div className="relative group flex justify-center items-center">
-            <div className="relative w-full h-[350px] md:h-[450px] overflow-hidden rounded-3xl shadow-2xl border-4 border-white/20">
-              {images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Slide ${index}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-                    index === currentIndex ? "opacity-100 scale-100" : "opacity-0 scale-110"
-                  }`}
-                />
-              ))}
-              
-              {/* Bottom Dots (Indicator) */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {images.map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`h-2 w-2 rounded-full transition-all ${i === currentIndex ? "bg-white w-6" : "bg-white/50"}`}
-                  />
-                ))}
-              </div>
-            </div>
+      <div className="relative max-w-7xl mx-auto px-6 w-full">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1]">
+            Shop Smart.{" "}
+            <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
+              Get It Fast.
+            </span>
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-gray-400 leading-relaxed max-w-xl">
+            Discover trending products, unbeatable deals, and lightning-fast delivery all in one place.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 mt-10">
+            <Button
+              asChild
+              className="h-12 px-8 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/40 hover:opacity-95 transition-all"
+            >
+              <Link to="/products">Shop Now</Link>
+            </Button>
           </div>
-
         </div>
       </div>
     </section>

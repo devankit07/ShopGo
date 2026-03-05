@@ -49,23 +49,62 @@ export const addProduct = async (req, res) => {
   }
 };
 
-export const getallproduct = async (_, res) => {
+export const getallproduct = async (req, res) => {
   try {
-    const product = await Product.find();
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 8));
+    const category = (req.query.category || "").trim();
+
+    const filter = {};
+    if (category && category.toLowerCase() !== "all") {
+      filter.category = new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+    }
+
+    const total = await Product.countDocuments(filter);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const skip = (page - 1) * limit;
+
+    const product = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      product,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getProductById = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const product = await Product.findById(productId).lean();
     if (!product) {
-      res.status(400).json({
-        scuccess: false,
-        message: "product not found",
-        product: [],
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
       });
     }
     return res.status(200).json({
-      scuccess: true,
+      success: true,
       product,
     });
   } catch (error) {
     return res.status(500).json({
-      scuccess: false,
+      success: false,
       message: error.message,
     });
   }

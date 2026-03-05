@@ -6,7 +6,6 @@ import {
   ShoppingBag,
   Package,
   Users,
-  FileText,
   ClipboardList,
   LogOut,
 } from "lucide-react";
@@ -27,7 +26,6 @@ const menu = [
   { path: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { path: "/admin/products", label: "Products", icon: Package },
   { path: "/admin/users", label: "Users", icon: Users },
-  { path: "/admin/reports", label: "Reports", icon: FileText },
   { path: "/admin/logs", label: "Action Log", icon: ClipboardList },
 ];
 

@@ -60,10 +60,10 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-background pt-24 pb-16">
+      <main className="dark min-h-screen bg-[#262a30] pt-24 pb-16">
         <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Your cart is empty</h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="text-2xl font-bold text-white">Your cart is empty</h1>
+          <p className="mt-2 text-gray-400">
             Add items from the Products page.
           </p>
           <Button asChild className="mt-6 bg-[#FF3F6C] hover:bg-[#e0355f]">
@@ -75,9 +75,9 @@ export default function Cart() {
   }
 
   return (
-    <main className="min-h-screen bg-background pt-24 pb-16">
+    <main className="dark min-h-screen bg-[#262a30] pt-24 pb-16">
       <div className="mx-auto max-w-4xl px-4">
-        <h1 className="mb-8 text-2xl font-bold text-foreground">Cart</h1>
+        <h1 className="mb-8 text-2xl font-bold text-white">Cart</h1>
         <ul className="space-y-4">
           {items.map((item) => (
             <li

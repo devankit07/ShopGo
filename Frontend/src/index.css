@@ -116,6 +116,33 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Home page dark theme animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes float {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.25; }
+}
+@keyframes scroll-banner {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+/* Ensure banner track doesn't shrink */
+.home-deals-track {
+  width: max-content;
+}
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-scroll-banner {
+  animation: scroll-banner 30s linear infinite;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

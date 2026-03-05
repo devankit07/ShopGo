@@ -8,7 +8,6 @@ import {
   deleteUser,
   getAllOrders,
   updateOrderStatus,
-  getReports,
   getActionLogs,
 } from "../controllers/adminController.js";
 import {
@@ -25,7 +24,6 @@ router.use(IsAuthenticated, isAdmin);
 
 router.get("/dashboard-stats", getDashboardStats);
 router.get("/analytics", getSalesAnalytics);
-router.get("/reports", getReports);
 router.get("/logs", getActionLogs);
 
 router.get("/users", getAdminUsers);

@@ -1,12 +1,16 @@
 import { cn } from "@/lib/utils";
 
-const CATEGORIES = [
+export const PRODUCT_CATEGORIES = [
   "All",
-  "Electric",
-  "Jewellery",
   "Electronics",
+  "Fashion",
+  "Jewellery",
+  "Home & Kitchen",
   "Accessories",
+  "Gadgets",
 ];
+
+const CATEGORIES = PRODUCT_CATEGORIES;
 
 export default function ProductFilter({ activeCategory, onSelect }) {
   return (

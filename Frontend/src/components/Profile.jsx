@@ -10,18 +10,18 @@ const Profile = () => {
   const userId = params.userId;
 
   return (
-    <div className="pt-28 pb-10 min-h-screen bg-[#dbdfe4] px-4">
+    <div className="dark pt-28 pb-10 min-h-screen bg-[#262a30] px-4">
       <Tabs defaultValue="profile" className="max-w-4xl mx-auto">
-        <TabsList className="grid w-full grid-cols-2 mb-8 bg-white/50 border border-gray-300">
+        <TabsList className="grid w-full grid-cols-2 mb-8 bg-[#2d3136] border border-white/10">
           <TabsTrigger
             value="profile"
-            className="data-[state=active]:bg-[#FF3F6C] data-[state=active]:text-white"
+            className="data-[state=active]:bg-teal-500 data-[state=active]:text-white text-gray-300"
           >
             <User className="w-4 h-4 mr-2" /> Profile
           </TabsTrigger>
           <TabsTrigger
             value="orders"
-            className="data-[state=active]:bg-[#FF3F6C] data-[state=active]:text-white"
+            className="data-[state=active]:bg-teal-500 data-[state=active]:text-white text-gray-300"
           >
             <Package className="w-4 h-4 mr-2" /> Orders
           </TabsTrigger>

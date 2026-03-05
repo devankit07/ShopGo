@@ -3,10 +3,10 @@ import Navbar from "./components/ui/Navbar";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
-import Verify from "./pages/verify.jsx";
-import VerifyEmail from "./pages/VerifyEmail";
+import VerifyOTP from "./pages/VerifyOTP.jsx";
 import Profile from "./components/Profile";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -14,8 +14,9 @@ import SalesAnalytics from "./components/admin/SalesAnalytics";
 import UsersManagement from "./components/admin/UsersManagement";
 import ProductsManagement from "./components/admin/ProductsManagement";
 import OrdersManagement from "./components/admin/OrdersManagement";
-import Reports from "./components/admin/Reports";
 import AdminLogs from "./pages/AdminLogs";
+import Feedback from "./pages/Feedback";
+import GiveFeedback from "./pages/GiveFeedback";
 
 const router = createBrowserRouter([
   {
@@ -44,18 +45,10 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/verify",
+    path: "/verify-otp",
     element: (
       <>
-        <Verify />
-      </>
-    ),
-  },
-  {
-    path: "/verify/:token",
-    element: (
-      <>
-        <VerifyEmail />
+        <VerifyOTP />
       </>
     ),
   },
@@ -65,6 +58,15 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <Products />
+      </>
+    ),
+  },
+  {
+    path: "/product/:productId",
+    element: (
+      <>
+        <Navbar />
+        <ProductDetail />
       </>
     ),
   },
@@ -87,6 +89,24 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/feedback",
+    element: (
+      <>
+        <Navbar />
+        <Feedback />
+      </>
+    ),
+  },
+  {
+    path: "/give-feedback",
+    element: (
+      <>
+        <Navbar />
+        <GiveFeedback />
+      </>
+    ),
+  },
+  {
     path: "/admin",
     element: <AdminLayout />,
     children: [
@@ -95,7 +115,6 @@ const router = createBrowserRouter([
       { path: "orders", element: <OrdersManagement /> },
       { path: "products", element: <ProductsManagement /> },
       { path: "users", element: <UsersManagement /> },
-      { path: "reports", element: <Reports /> },
       { path: "logs", element: <AdminLogs /> },
     ],
   },

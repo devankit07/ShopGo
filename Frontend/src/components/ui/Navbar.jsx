@@ -1,6 +1,6 @@
 import { ShoppingCart } from "lucide-react";
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "./button";
 import axios from "axios";
 import { toast } from "sonner";
@@ -17,12 +17,22 @@ const BRAND_LOGO = (
 );
 
 const Navbar = () => {
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
   const { user } = useSelector((state) => state.User);
   const cartCount = useSelector(selectCartCount);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const navLight = isHome;
 
   const accesstoken = localStorage.getItem("accesstoken");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const logouthandler = async () => {
     try {
@@ -44,8 +54,17 @@ const Navbar = () => {
     }
   };
   return (
-    <header className="fixed top-0 left-0 w-full z-20 bg-white/10 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-6">
+    <header className="fixed top-0 left-0 w-full z-20 transition-[background,border,box-shadow] duration-300">
+      <div
+        className={`max-w-7xl mx-auto flex justify-between items-center py-3 px-6 transition-all duration-300 ${
+          isScrolled
+            ? "mx-4 mt-3 mb-3 rounded-full backdrop-blur-xl border shadow-lg " +
+              (navLight ? "bg-black/30 border-white/20" : "bg-white/15 border-white/20 shadow-black/5")
+            : navLight
+            ? "bg-transparent border border-transparent"
+            : ""
+        }`}
+      >
         <Link
           to="/"
           className="flex items-center gap-2 transition-transform hover:scale-[1.02]"
@@ -54,10 +73,10 @@ const Navbar = () => {
         </Link>
 
         <nav className="flex items-center gap-10">
-          <ul className="hidden md:flex gap-8 items-center text-[15px] font-bold text-[#3E4152] uppercase tracking-wide">
+          <ul className={`hidden md:flex gap-8 items-center text-[15px] font-bold uppercase tracking-wide ${navLight ? "text-white/90" : "text-[#3E4152]"}`}>
             <Link
               to="/"
-              className="hover:text-[var(--brand-accent)] transition-colors relative group"
+              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
             >
               <li className="leading-[1.2em]">
                 <span
@@ -73,11 +92,11 @@ const Navbar = () => {
                   </span>
                 </span>
               </li>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--brand-accent)] transition-all group-hover:w-full"></span>
+              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
             </Link>
             <Link
               to="/products"
-              className="hover:text-[var(--brand-accent)] transition-colors relative group"
+              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
             >
               <li className="leading-[1.2em]">
                 <span
@@ -93,13 +112,33 @@ const Navbar = () => {
                   </span>
                 </span>
               </li>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--brand-accent)] transition-all group-hover:w-full"></span>
+              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
+            </Link>
+            <Link
+              to="/feedback"
+              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
+            >
+              <li className="leading-[1.2em]">
+                <span
+                  className="block h-[1.2em] overflow-hidden"
+                  style={{ lineHeight: "1.2em" }}
+                >
+                  <span
+                    className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
+                    style={{ width: "max-content" }}
+                  >
+                    <span className="h-[1.2em] flex items-center shrink-0">Feedback</span>
+                    <span className="h-[1.2em] flex items-center shrink-0">Feedback</span>
+                  </span>
+                </span>
+              </li>
+              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
             </Link>
 
             {user?.role === "admin" && (
               <Link
                 to="/admin"
-                className="hover:text-[var(--brand-accent)] transition-colors relative group"
+                className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
               >
                 <li className="leading-[1.2em]">
                   <span
@@ -115,29 +154,29 @@ const Navbar = () => {
                     </span>
                   </span>
                 </li>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--brand-accent)] transition-all group-hover:w-full"></span>
+                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
               </Link>
             )}
 
             {user && (
               <Link
-                to={`/profile/${user._id}`} 
-                className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-1.5 rounded-full hover:bg-gray-100 transition-colors shadow-sm"
+                to={`/profile/${user._id}`}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full transition-colors shadow-sm ${navLight ? "bg-white/15 border border-white/20 hover:bg-white/25" : "bg-gray-50 border border-gray-200 hover:bg-gray-100"}`}
               >
-                <div className="w-6 h-6 rounded-full bg-[var(--brand-accent)] flex items-center justify-center text-[10px] text-white">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white ${navLight ? "bg-teal-500" : "bg-[var(--brand-accent)]"}`}>
                   {user.firstName?.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-semibold text-[#3E4152]">
+                <span className={`text-sm font-semibold ${navLight ? "text-white" : "text-[#3E4152]"}`}>
                   Hi, {user.firstName}
                 </span>
               </Link>
             )}
           </ul>
 
-          <div className="flex items-center gap-6 border-l pl-8 border-gray-300">
+          <div className={`flex items-center gap-6 border-l pl-8 ${navLight ? "border-white/30" : "border-gray-300"}`}>
             <Link
               to="/cart"
-              className="relative group text-[#3E4152] hover:text-[var(--brand-accent)] transition-colors"
+              className={`relative group transition-colors ${navLight ? "text-white/90 hover:text-teal-300" : "text-[#3E4152] hover:text-[var(--brand-accent)]"}`}
             >
               <ShoppingCart className="w-6 h-6" />
               <span className="absolute -top-2 -right-3 bg-[var(--brand-accent)] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md group-hover:scale-110 transition-transform">
@@ -149,14 +188,14 @@ const Navbar = () => {
               <Button
                 onClick={logouthandler}
                 variant="ghost"
-                className="text-[#3E4152] font-bold hover:text-[var(--brand-accent)] hover:bg-orange-50 transition-all px-4"
+                className={`font-bold transition-all px-4 ${navLight ? "text-white/90 hover:text-teal-300 hover:bg-white/10" : "text-[#3E4152] hover:text-[var(--brand-accent)] hover:bg-orange-50"}`}
               >
                 Logout
               </Button>
             ) : (
               <Button
                 onClick={() => navigate("/login")}
-                className="bg-[var(--brand-accent)] hover:opacity-90 text-white font-bold px-8 rounded-md  transition-all active:scale-95"
+                className={navLight ? "bg-teal-500 hover:bg-teal-600 text-white font-bold px-8 rounded-md transition-all active:scale-95" : "bg-[var(--brand-accent)] hover:opacity-90 text-white font-bold px-8 rounded-md transition-all active:scale-95"}
               >
                 Login
               </Button>

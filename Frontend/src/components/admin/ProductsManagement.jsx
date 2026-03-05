@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { adminApi } from "@/lib/adminApi";
+import { PRODUCT_CATEGORIES } from "@/components/products/ProductFilter";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Pencil, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const ADMIN_CATEGORIES = PRODUCT_CATEGORIES.filter((c) => c !== "All");
 
 const API_BASE = "http://localhost:8000/api/admin";
 
@@ -217,12 +220,17 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
             </div>
             <div>
               <Label>Category</Label>
-              <Input
+              <select
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                 required
-                className="mt-1"
-              />
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
+              >
+                <option value="">Select category</option>
+                {ADMIN_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
             <div>
               <Label>Brand</Label>

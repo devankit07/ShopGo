@@ -1,19 +1,31 @@
 import ProductCard from "./ProductCard";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export default function ProductGrid({ products, loading, emptyMessage }) {
+export default function ProductGrid({
+  products,
+  loading,
+  emptyMessage,
+  pagination,
+  onPageChange,
+}) {
+  const { page, totalPages } = pagination || { page: 1, totalPages: 1 };
+
   if (loading) {
     return (
-      <div
-        className={cn(
-          "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
-          "animate-in fade-in duration-300"
-        )}
-      >
-        {Array.from({ length: 8 }).map((_, i) => (
-          <ProductCardSkeleton key={i} />
-        ))}
-      </div>
+      <>
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
+            "animate-in fade-in duration-300"
+          )}
+        >
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      </>
     );
   }
 
@@ -28,32 +40,97 @@ export default function ProductGrid({ products, loading, emptyMessage }) {
   }
 
   return (
-    <div
-      className={cn(
-        "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
-        "animate-in fade-in duration-300"
+    <>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
+          "animate-in fade-in duration-300"
+        )}
+      >
+        {products.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <PaginationBar
+          page={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
       )}
-    >
-      {products.map((product) => (
-        <ProductCard key={product._id} product={product} />
-      ))}
-    </div>
+    </>
   );
 }
 
 function ProductCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-      <div className="aspect-square animate-pulse bg-muted" />
-      <div className="flex flex-col gap-2 p-4">
-        <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-full animate-pulse rounded bg-muted" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
-        <div className="mt-2 h-6 w-1/3 animate-pulse rounded bg-muted" />
+      <div className="aspect-[4/3] animate-pulse bg-muted" />
+      <div className="flex flex-col gap-1.5 p-3">
+        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+        <div className="h-3 w-full animate-pulse rounded bg-muted" />
+        <div className="mt-1 h-5 w-1/3 animate-pulse rounded bg-muted" />
       </div>
-      <div className="p-4 pt-0">
-        <div className="h-10 w-full animate-pulse rounded-xl bg-muted" />
+      <div className="p-3 pt-0">
+        <div className="h-9 w-full animate-pulse rounded-xl bg-muted" />
       </div>
     </div>
+  );
+}
+
+function PaginationBar({ page, totalPages, onPageChange }) {
+  const pages = [];
+  const showMax = 5;
+  let start = Math.max(1, page - Math.floor(showMax / 2));
+  let end = Math.min(totalPages, start + showMax - 1);
+  if (end - start + 1 < showMax) start = Math.max(1, end - showMax + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  return (
+    <nav
+      className="mt-10 flex flex-wrap items-center justify-center gap-2"
+      aria-label="Pagination"
+    >
+      <Button
+        variant="outline"
+        size="sm"
+        className="rounded-lg"
+        onClick={() => onPageChange(page - 1)}
+        disabled={page <= 1}
+        aria-label="Previous page"
+      >
+        <ChevronLeft className="size-4" />
+        <span className="ml-1 hidden sm:inline">Previous</span>
+      </Button>
+      <div className="flex items-center gap-1">
+        {pages.map((p) => (
+          <Button
+            key={p}
+            variant={p === page ? "default" : "outline"}
+            size="sm"
+            className={cn(
+              "min-w-[2.25rem] rounded-lg",
+              p === page && "bg-[#FF3F6C] text-white hover:bg-[#e0355f]"
+            )}
+            onClick={() => onPageChange(p)}
+            aria-current={p === page ? "page" : undefined}
+          >
+            {p}
+          </Button>
+        ))}
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="rounded-lg"
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages}
+        aria-label="Next page"
+      >
+        <span className="mr-1 hidden sm:inline">Next</span>
+        <ChevronRight className="size-4" />
+      </Button>
+    </nav>
   );
 }

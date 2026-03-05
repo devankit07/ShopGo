@@ -105,7 +105,7 @@ export default function OrderTable({ orders }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-[#FF3F6C] border-[#FF3F6C]/30 hover:bg-[#FF3F6C]/10"
+                          className="text-[#FF3F6C] border-[#FF3F6C]/30 hover:bg-[#FF3F6C]/10 hover:text-[#FF3F6C]"
                           onClick={() => setSelectedOrder(order)}
                         >
                           <Eye className="w-4 h-4 mr-1" />

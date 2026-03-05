@@ -195,7 +195,7 @@ export default function ProfileSection({ userId }) {
         <CardTitle className="text-2xl font-bold text-[#3E4152]">
           Account Settings
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-600">
           Update your personal information below.
         </CardDescription>
       </CardHeader>
@@ -225,74 +225,74 @@ export default function ProfileSection({ userId }) {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>First Name</Label>
+                <Label className="text-gray-700">First Name</Label>
                 <Input
                   type="text"
                   name="firstName"
                   value={updateUser.firstName}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C]"
+                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Last Name</Label>
+                <Label className="text-gray-700">Last Name</Label>
                 <Input
                   type="text"
                   name="lastName"
                   value={updateUser.lastName}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C]"
+                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Email Address</Label>
+              <Label className="text-gray-700">Email Address</Label>
               <Input
                 type="email"
                 value={updateUser.email}
                 disabled
-                className="bg-gray-100 cursor-not-allowed"
+                className="bg-gray-100 cursor-not-allowed text-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label>Phone No</Label>
+              <Label className="text-gray-700">Phone No</Label>
               <Input
                 type="text"
                 name="phoneNo"
                 value={updateUser.phoneNo}
                 onChange={handleChange}
-                className="focus-visible:ring-[#FF3F6C]"
+                className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
-              <Label>Address</Label>
+              <Label className="text-gray-700">Address</Label>
               <Input
                 type="text"
                 name="address"
                 value={updateUser.address}
                 onChange={handleChange}
-                className="focus-visible:ring-[#FF3F6C]"
+                className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>City</Label>
+                <Label className="text-gray-700">City</Label>
                 <Input
                   type="text"
                   name="city"
                   value={updateUser.city}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C]"
+                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Zip Code</Label>
+                <Label className="text-gray-700">Zip Code</Label>
                 <Input
                   type="text"
                   name="ZipCode"
                   value={updateUser.ZipCode}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C]"
+                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
