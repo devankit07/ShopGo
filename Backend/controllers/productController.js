@@ -2,6 +2,7 @@ import getDataUri from "../utils/dataUri.js";
 import Cloudinary from "../utils/cloudinary.js";
 import Product from "../models/productModel.js";
 import cloudinary from "../utils/cloudinary.js";
+import { logAction } from "../utils/adminLog.js";
 
 export const addProduct = async (req, res) => {
   try {
@@ -37,6 +38,7 @@ export const addProduct = async (req, res) => {
       brand,
       productImage, //array of objects [{url,punlic_id}]
     });
+    if (req.id) await logAction(req.id, "Product added", productName, "product", newProduct._id);
     return res.status(200).json({
       scuccess: true,
       message: "product added successfully",
@@ -87,6 +89,7 @@ export const deleteProduct = async (req, res) => {
     }
     //delet product from mongodb
     await Product.findByIdAndDelete(productid);
+    if (req.id) await logAction(req.id, "Product deleted", product.productName, "product", productid);
     return res.status(200).json({
       scuccess: true,
       message: "Product deleted successfully",
@@ -159,6 +162,7 @@ export const updateProduct = async (req, res) => {
     product.brand = brand || product.brand;
     product.productImage = UpdateImage;
     await product.save();
+    if (req.id) await logAction(req.id, "Product updated", product.productName, "product", productid);
     return res.status(200).json({
       scuccess: true,
       message: "product updated successfully",

@@ -7,7 +7,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "seed:products": "node scripts/seedProducts.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

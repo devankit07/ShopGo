@@ -26,7 +26,7 @@ router.post("/forgot-password", IsAuthenticated, forgotPassword);
 router.post("/verify-otp/:email", verifyotp);
 router.post("/change-password/:email", changePassword);
 router.get("/all-user", IsAuthenticated, isAdmin, allUser);
-router.get("/get-user/:user-Id", getUserById);
+router.get("/get-user/:userId", IsAuthenticated, getUserById);
 router.put("/update/:id", IsAuthenticated, singleUpload, updateuser);
 
 export default router;

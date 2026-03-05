@@ -14,8 +14,8 @@ const Footer = () => {
 
         {/* 1. Info Section */}
         <div className="space-y-4">
-          <Link to="/" className="inline-block transition-transform hover:scale-105">
-            <img src="/logo.png" alt="ShopGo Logo" className="w-32 " />
+          <Link to="/" className="inline-block transition-transform hover:scale-[1.02]">
+            <img src="/icon.png" alt="SHOP-GO" className="h-10 w-auto object-contain" />
           </Link>
           <p className="text-sm leading-relaxed">
             Powering Your World with the Best in Electronics. High-quality gadgets at unbeatable prices.
@@ -33,7 +33,7 @@ const Footer = () => {
           </h3>
           <ul className="space-y-3 text-sm">
             {["Contact Us", "Shipping & Returns", "FAQs", "Order Tracking"].map((item) => (
-              <li key={item} className="hover:text-[#FF3F6C] cursor-pointer transition-colors w-max">
+              <li key={item} className="hover:text-[var(--brand-accent)] cursor-pointer transition-colors w-max">
                 {item}
               </li>
             ))}
@@ -72,11 +72,11 @@ const Footer = () => {
             <input
               type="email"
               placeholder="Email address"
-              className="w-full bg-[#3e4152] border-none p-3 rounded-l-md text-white text-sm outline-none focus:ring-1 focus:ring-[#FF3F6C]"
+              className="w-full bg-[#3e4152] border-none p-3 rounded-l-md text-white text-sm outline-none focus:ring-1 focus:ring-[var(--brand-accent)]"
             />
             <button
               type="submit"
-              className="bg-[#FF3F6C] px-5 rounded-r-md text-white font-bold text-sm hover:bg-[#e0355f] transition-all active:scale-95"
+              className="bg-[var(--brand-accent)] px-5 rounded-r-md text-white font-bold text-sm hover:opacity-90 transition-all active:scale-95"
             >
               Join
             </button>
@@ -88,7 +88,7 @@ const Footer = () => {
       <div className="mt-16 border-t border-gray-700/50 pt-8 text-center text-[12px] tracking-widest uppercase">
         <p>
           &copy; {new Date().getFullYear()}{" "}
-          <span className="text-[#FF3F6C] font-bold">ShopGo</span>. All rights reserved.
+          <span className="font-bold text-[var(--brand-accent)]">SHOP-GO</span>. All rights reserved.
         </p>
       </div>
     </footer>

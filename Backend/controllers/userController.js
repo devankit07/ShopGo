@@ -452,28 +452,29 @@ export const updateuser = async (req, res) => {
       profilePicUrl = uploadResult.secure_url;
       profilePicPublicId = uploadResult.public_id;
     }
-    // update fields
-    user.firstName = firstName || firstName;
-    user.lastName = lastName || lastName;
-    user.address = address || address;
-    user.city = city || city;
-    user.ZipCode = ZipCode || ZipCode;
-    user.phoneNo = phoneNo || phoneNo;
-    user.role = role;
+    // update fields (only when provided so we don't overwrite with undefined)
+    if (firstName !== undefined && firstName !== "") user.firstName = firstName;
+    if (lastName !== undefined && lastName !== "") user.lastName = lastName;
+    if (address !== undefined) user.address = address;
+    if (city !== undefined) user.city = city;
+    if (ZipCode !== undefined) user.ZipCode = ZipCode;
+    if (phoneNo !== undefined) user.phoneNo = phoneNo;
+    if (role !== undefined && loggeInUser.role === "admin") user.role = role;
     user.profilePic = profilePicUrl;
     user.profilePicPublicId = profilePicPublicId;
 
+    const updatedUser = await user.save();
+    const userResponse = updatedUser.toObject();
+    delete userResponse.password;
+    delete userResponse.otp;
+    delete userResponse.otpExpiry;
+    delete userResponse.token;
 
-    const updatedUser = await user.save()
-
-    return res.status(200).json(
-      {
-        success:true,
-
-        message:"profile updated successfully",
-        user: updatedUser
-      }
-    )
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: userResponse,
+    });
 
 
 
