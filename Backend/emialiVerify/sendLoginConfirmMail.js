@@ -2,17 +2,16 @@ import nodemailer from "nodemailer";
 import "dotenv/config";
 
 const LOGIN_VERIFY_EXPIRY_MIN = 5;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
 
 export async function sendLoginConfirmMail(email, approveLink, displayCode) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
-    });
-
     const mailOptions = {
       from: process.env.MAIL_USER,
       to: email,

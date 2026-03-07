@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 
-const POLL_INTERVAL_MS = 2500;
+const POLL_INTERVAL_MS = 1500;
 const RESEND_COOLDOWN_SEC = 30;
 
 const API_BASE = "/api/v1/user";
@@ -31,6 +31,7 @@ const VerifyOTP = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const pollRef = useRef(null);
+  const checkInFlightRef = useRef(false);
 
   const getPendingToken = () => sessionStorage.getItem("pendingToken");
 
@@ -91,6 +92,30 @@ const VerifyOTP = () => {
       setLoading(false);
     }
   }, [completeLoginAndRedirect]);
+
+  const checkVerificationStatus = useCallback(async () => {
+    const token = getPendingToken();
+    if (!token || loading || checkInFlightRef.current) return;
+    checkInFlightRef.current = true;
+    try {
+      const res = await axios.get(`${API_BASE}/check-login-verification`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.success && res.data.verified) {
+        if (pollRef.current) clearInterval(pollRef.current);
+        await callCompleteLogin();
+        return;
+      }
+      if (res.data.displayCode && !displayCode) {
+        setDisplayCode(res.data.displayCode);
+        sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
+      }
+    } catch {
+      // ignore poll errors
+    } finally {
+      checkInFlightRef.current = false;
+    }
+  }, [callCompleteLogin, displayCode, loading]);
 
   // Handle redirect from email link (same tab or new tab)
   useEffect(() => {
@@ -155,30 +180,26 @@ const VerifyOTP = () => {
     const token = getPendingToken();
     if (!token || loading) return;
 
-    const poll = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/check-login-verification`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.data.success && res.data.verified) {
-          if (pollRef.current) clearInterval(pollRef.current);
-          callCompleteLogin();
-        }
-        if (res.data.displayCode && !displayCode) {
-          setDisplayCode(res.data.displayCode);
-          sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
-        }
-      } catch {
-        // ignore poll errors
-      }
-    };
-
-    poll();
-    pollRef.current = setInterval(poll, POLL_INTERVAL_MS);
+    checkVerificationStatus();
+    pollRef.current = setInterval(checkVerificationStatus, POLL_INTERVAL_MS);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [loading, displayCode, callCompleteLogin]);
+  }, [loading, checkVerificationStatus]);
+
+  // Re-check immediately when tab becomes active (avoids waiting for next poll tick)
+  useEffect(() => {
+    const recheck = () => {
+      if (document.visibilityState === "hidden") return;
+      checkVerificationStatus();
+    };
+    window.addEventListener("focus", recheck);
+    document.addEventListener("visibilitychange", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      document.removeEventListener("visibilitychange", recheck);
+    };
+  }, [checkVerificationStatus]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;

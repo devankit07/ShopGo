@@ -21,6 +21,14 @@ const getBackendUrl = (req) => {
   return `${req.protocol}://${host}`;
 };
 
+const sendLoginMailAsync = ({ email, approveLink, displayCode }) => {
+  setImmediate(() => {
+    sendLoginConfirmMail(email, approveLink, displayCode).catch((error) => {
+      console.error("Failed to send login confirmation email:", error?.message || error);
+    });
+  });
+};
+
 
 export const register = async (req, res) => {
   try {
@@ -115,7 +123,7 @@ export const login = async (req, res) => {
 
     const backendUrl = getBackendUrl(req);
     const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
-    await sendLoginConfirmMail(email, approveLink, displayCode);
+    sendLoginMailAsync({ email, approveLink, displayCode });
 
     const pendingToken = jwt.sign(
       { email: user.email, purpose: PENDING_LOGIN_PURPOSE },
@@ -408,7 +416,7 @@ export const resendLoginVerification = async (req, res) => {
 
     const backendUrl = getBackendUrl(req);
     const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
-    await sendLoginConfirmMail(email, approveLink, displayCode);
+    sendLoginMailAsync({ email, approveLink, displayCode });
 
     return res.status(200).json({
       success: true,
