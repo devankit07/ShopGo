@@ -35,15 +35,12 @@ const Signup = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:8000/api/v1/user/register",
-        {
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
-        }
-      );
+      const res = await axios.post("/api/v1/user/register", {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
       if (res.data.success) {
         toast.success(res.data.message);
         navigate("/login", { replace: true });

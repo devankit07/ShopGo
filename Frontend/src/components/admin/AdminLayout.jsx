@@ -42,7 +42,7 @@ export default function AdminLayout() {
   const logout = async () => {
     try {
       const token = localStorage.getItem("accesstoken");
-      await axios.post("http://localhost:8000/api/v1/user/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("/api/v1/user/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
       dispatch(setUser(null));
       localStorage.removeItem("user");
       localStorage.removeItem("accesstoken");

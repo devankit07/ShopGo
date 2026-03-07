@@ -27,7 +27,10 @@ app.use("/api/v1/orders", orderRoute);
 app.use("/api/v1/feedback", feedbackRoute);
 app.use("/api/admin", adminRoute);
 
-// http://localhost:8000/api/v1/user/register
+// Serve React app for non-API routes (supports refresh/deep links on Render)
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 app.listen(PORT, () => {
   connectDB();

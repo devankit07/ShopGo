@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 const ADMIN_CATEGORIES = PRODUCT_CATEGORIES.filter((c) => c !== "All");
 const PAGE_SIZE = 6;
 
-const API_BASE = "http://localhost:8000/api/admin";
+const API_BASE = "/api/admin";
 
 function getAuthHeaders() {
   const token = localStorage.getItem("accesstoken");

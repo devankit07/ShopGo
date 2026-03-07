@@ -38,7 +38,7 @@ const Navbar = () => {
   const logouthandler = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/user/logout`,
+        "/api/v1/user/logout",
         {},
         {
           headers: {

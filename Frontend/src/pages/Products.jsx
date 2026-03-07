@@ -3,7 +3,7 @@ import axios from "axios";
 import ProductFilter from "@/components/products/ProductFilter";
 import ProductGrid from "@/components/products/ProductGrid";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 const PER_PAGE_MOBILE = 6;
 const PER_PAGE_DESKTOP = 9;
 

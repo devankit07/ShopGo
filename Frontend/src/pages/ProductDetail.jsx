@@ -8,7 +8,7 @@ import { addToCart } from "@/redux/cartSlice";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 const PLACEHOLDER_IMG = "https://placehold.co/600x600?text=Product";
 
 export default function ProductDetail() {

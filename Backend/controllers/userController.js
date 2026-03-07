@@ -15,6 +15,12 @@ const LOGIN_VERIFY_EXPIRY_MS = 5 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 30 * 1000;
 const PENDING_LOGIN_PURPOSE = "login_verify";
 
+const getBackendUrl = (req) => {
+  if (process.env.BACKEND_URL) return process.env.BACKEND_URL;
+  const host = req.get("host");
+  return `${req.protocol}://${host}`;
+};
+
 
 export const register = async (req, res) => {
   try {
@@ -107,7 +113,7 @@ export const login = async (req, res) => {
       lastSentAt,
     });
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    const backendUrl = getBackendUrl(req);
     const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
     await sendLoginConfirmMail(email, approveLink, displayCode);
 
@@ -400,7 +406,7 @@ export const resendLoginVerification = async (req, res) => {
     verification.approvedAt = null;
     await verification.save();
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    const backendUrl = getBackendUrl(req);
     const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
     await sendLoginConfirmMail(email, approveLink, displayCode);
 

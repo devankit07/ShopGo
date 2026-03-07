@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/userslice";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function ProfileSection({ userId }) {
   const user = useSelector((store) => store.user);

@@ -4,7 +4,7 @@ import axios from "axios";
 import ProductCard from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 const DISPLAY_COUNT = 8;
 
 export default function FeaturedProducts() {

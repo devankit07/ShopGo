@@ -5,7 +5,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "/api/v1";
 
 export default function GiveFeedback() {
   const navigate = useNavigate();

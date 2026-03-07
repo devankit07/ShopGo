@@ -5,7 +5,7 @@ import OrderTable from "./OrderTable";
 import OrderCard from "./OrderCard";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "/api/v1";
 
 const summaryCards = [
   { key: "total", label: "Total Orders", desc: "Orders placed", icon: Package, color: "bg-[#FF3F6C]/10 text-[#FF3F6C]" },

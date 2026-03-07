@@ -18,7 +18,7 @@ import { setUser } from "@/redux/userslice";
 const POLL_INTERVAL_MS = 2500;
 const RESEND_COOLDOWN_SEC = 30;
 
-const API_BASE = "http://localhost:8000/api/v1/user";
+const API_BASE = "/api/v1/user";
 
 const VerifyOTP = () => {
   const [displayCode, setDisplayCode] = useState(
