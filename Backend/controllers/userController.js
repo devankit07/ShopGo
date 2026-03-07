@@ -2,23 +2,28 @@ import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Session } from "../models/sessionModel.js";
-import { LoginOTP } from "../models/loginOtpModel.js";
+import {
+  LoginVerification,
+  generateDisplayCode,
+  generateVerifyToken,
+} from "../models/loginVerificationModel.js";
+import { sendLoginConfirmMail } from "../emialiVerify/sendLoginConfirmMail.js";
 import { sendOTPMail } from "../emialiVerify/sendOTPMail.js";
 import cloudinary from "../utils/cloudinary.js";
 
-const LOGIN_OTP_EXPIRY_MS = 5 * 60 * 1000;
-const MAX_OTP_ATTEMPTS = 5;
+const LOGIN_VERIFY_EXPIRY_MS = 5 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 30 * 1000;
+const PENDING_LOGIN_PURPOSE = "login_verify";
 
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Name, email and password are required",
+        message: "First name, last name, email and password are required",
       });
     }
 
@@ -31,13 +36,12 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const nameTrimmed = String(name).trim();
-    const firstName = nameTrimmed.includes(" ") ? nameTrimmed.split(" ")[0] : nameTrimmed;
-    const lastName = nameTrimmed.includes(" ") ? nameTrimmed.slice(firstName.length).trim() : "";
+    const firstNameTrimmed = String(firstName).trim();
+    const lastNameTrimmed = String(lastName).trim();
 
     const newUser = await User.create({
-      firstName,
-      lastName,
+      firstName: firstNameTrimmed,
+      lastName: lastNameTrimmed,
       email,
       password: hashedPassword,
       isVerified: true,
@@ -89,31 +93,35 @@ export const login = async (req, res) => {
       });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpHash = await bcrypt.hash(otp, 10);
-    const expiresAt = new Date(Date.now() + LOGIN_OTP_EXPIRY_MS);
+    const displayCode = generateDisplayCode();
+    const verifyToken = generateVerifyToken();
+    const expiresAt = new Date(Date.now() + LOGIN_VERIFY_EXPIRY_MS);
     const lastSentAt = new Date();
 
-    await LoginOTP.findOneAndDelete({ userId: user._id });
-    await LoginOTP.create({
+    await LoginVerification.deleteMany({ userId: user._id });
+    await LoginVerification.create({
       userId: user._id,
-      otpHash,
+      displayCode,
+      verifyToken,
       expiresAt,
       lastSentAt,
     });
 
-    await sendOTPMail(otp, email, "login");
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
+    await sendLoginConfirmMail(email, approveLink, displayCode);
 
     const pendingToken = jwt.sign(
-      { email: user.email, purpose: "login_otp" },
+      { email: user.email, purpose: PENDING_LOGIN_PURPOSE },
       process.env.SECRET_KEY,
       { expiresIn: "5m" },
     );
 
     return res.status(200).json({
       success: true,
-      message: "Verification code sent to your email",
+      message: "We sent a confirmation link to your email. Open it and confirm to continue.",
       pendingToken,
+      displayCode,
     });
   } catch (error) {
     return res.status(500).json({
@@ -123,70 +131,129 @@ export const login = async (req, res) => {
   }
 };
 
-export const verifyLoginOtp = async (req, res) => {
+/** GET: Poll to see if user has approved login via email link */
+export const checkLoginVerification = async (req, res) => {
   try {
-    const { otp } = req.body;
     const { email } = req.payload;
-
-    if (!otp || String(otp).length !== 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid 6-digit code",
-      });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const verification = await LoginVerification.findOne({ userId: user._id });
+    if (!verification) {
+      return res.status(200).json({
+        success: true,
+        verified: false,
+        message: "No verification pending.",
       });
     }
+    if (new Date() > verification.expiresAt) {
+      await LoginVerification.deleteOne({ _id: verification._id });
+      return res.status(200).json({
+        success: true,
+        verified: false,
+        message: "Verification expired.",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      verified: !!verification.approvedAt,
+      displayCode: verification.displayCode,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-    const loginOtpDoc = await LoginOTP.findOne({ userId: user._id });
-    if (!loginOtpDoc) {
+/** GET: Magic link from email – mark verification approved and redirect to frontend with one-time token (so the tab that opens from the link can complete login without sessionStorage) */
+export const approveLogin = async (req, res) => {
+  try {
+    const { token } = req.query;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    if (!token) {
+      return res.redirect(`${frontendUrl}/verify-otp?error=missing_token`);
+    }
+    const verification = await LoginVerification.findOne({ verifyToken: token });
+    if (!verification || new Date() > verification.expiresAt) {
+      return res.redirect(`${frontendUrl}/verify-otp?error=expired`);
+    }
+    verification.approvedAt = new Date();
+    await verification.save();
+
+    const user = await User.findById(verification.userId);
+    if (!user) {
+      return res.redirect(`${frontendUrl}/verify-otp?error=server`);
+    }
+    const loginToken = jwt.sign(
+      { purpose: "login_complete", userId: user._id.toString(), email: user.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "2m" },
+    );
+    return res.redirect(`${frontendUrl}/verify-otp?approved=1&loginToken=${loginToken}`);
+  } catch (error) {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    return res.redirect(`${frontendUrl}/verify-otp?error=server`);
+  }
+};
+
+/** POST: Complete login using one-time token from email link (used when link opens in a new tab – no pendingToken in sessionStorage) */
+export const completeLoginByToken = async (req, res) => {
+  try {
+    const { loginToken } = req.body;
+    if (!loginToken) {
       return res.status(400).json({
         success: false,
-        message: "No verification pending. Please log in again.",
+        message: "Missing login token. Please use the link from your email.",
       });
     }
-
-    if (loginOtpDoc.attempts >= MAX_OTP_ATTEMPTS) {
-      await LoginOTP.findOneAndDelete({ userId: user._id });
-      return res.status(429).json({
+    let decoded;
+    try {
+      decoded = jwt.verify(loginToken, process.env.SECRET_KEY);
+    } catch {
+      return res.status(401).json({
         success: false,
-        message: "Too many attempts. Please log in again to get a new code.",
+        message: "Link expired or invalid. Please log in again.",
+      });
+    }
+    if (decoded.purpose !== "login_complete" || !decoded.userId || !decoded.email) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid login link. Please log in again.",
       });
     }
 
-    if (new Date() > loginOtpDoc.expiresAt) {
-      await LoginOTP.findOneAndDelete({ userId: user._id });
+    const user = await User.findOne({ _id: decoded.userId, email: decoded.email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const verification = await LoginVerification.findOne({ userId: user._id });
+    if (!verification || !verification.approvedAt) {
       return res.status(400).json({
         success: false,
-        message: "Verification code has expired. Please request a new one.",
+        message: "Verification not approved. Please use the link from your email.",
       });
     }
-
-    const isOtpValid = await bcrypt.compare(otp, loginOtpDoc.otpHash);
-    if (!isOtpValid) {
-      loginOtpDoc.attempts += 1;
-      await loginOtpDoc.save();
-      const remaining = MAX_OTP_ATTEMPTS - loginOtpDoc.attempts;
+    if (new Date() > verification.expiresAt) {
+      await LoginVerification.deleteOne({ _id: verification._id });
       return res.status(400).json({
         success: false,
-        message: `Invalid code. ${remaining} attempt(s) remaining.`,
+        message: "Verification expired. Please log in again.",
       });
     }
 
-    await LoginOTP.findOneAndDelete({ userId: user._id });
+    await LoginVerification.deleteOne({ _id: verification._id });
 
     const accesstoken = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role, email: user.email },
       process.env.SECRET_KEY,
       { expiresIn: "10d" },
     );
     const refreshtoken = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role },
       process.env.SECRET_KEY,
       { expiresIn: "30d" },
     );
@@ -217,7 +284,8 @@ export const verifyLoginOtp = async (req, res) => {
   }
 };
 
-export const resendLoginOtp = async (req, res) => {
+/** POST: After approval (from poll or redirect), issue tokens and complete login */
+export const completeLogin = async (req, res) => {
   try {
     const { email } = req.payload;
 
@@ -229,8 +297,80 @@ export const resendLoginOtp = async (req, res) => {
       });
     }
 
-    const loginOtpDoc = await LoginOTP.findOne({ userId: user._id });
-    if (!loginOtpDoc) {
+    const verification = await LoginVerification.findOne({ userId: user._id });
+    if (!verification) {
+      return res.status(400).json({
+        success: false,
+        message: "No verification pending. Please log in again.",
+      });
+    }
+    if (!verification.approvedAt) {
+      return res.status(400).json({
+        success: false,
+        message: "Please approve the login from the link we sent to your email.",
+      });
+    }
+    if (new Date() > verification.expiresAt) {
+      await LoginVerification.deleteOne({ _id: verification._id });
+      return res.status(400).json({
+        success: false,
+        message: "Verification expired. Please log in again.",
+      });
+    }
+
+    await LoginVerification.deleteOne({ _id: verification._id });
+
+    const accesstoken = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.SECRET_KEY,
+      { expiresIn: "10d" },
+    );
+    const refreshtoken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.SECRET_KEY,
+      { expiresIn: "30d" },
+    );
+
+    await Session.findOneAndDelete({ userId: user._id });
+    await Session.create({ userId: user._id });
+    user.isLoggedIn = true;
+    await user.save();
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.otp;
+    delete userResponse.otpExpiry;
+    delete userResponse.token;
+
+    return res.status(200).json({
+      success: true,
+      message: user.role === "admin" ? "Welcome to the admin panel" : `Welcome back ${user.firstName}`,
+      user: userResponse,
+      accesstoken,
+      refreshtoken,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const resendLoginVerification = async (req, res) => {
+  try {
+    const { email } = req.payload;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const verification = await LoginVerification.findOne({ userId: user._id });
+    if (!verification) {
       return res.status(400).json({
         success: false,
         message: "No verification pending. Please log in again.",
@@ -238,32 +378,36 @@ export const resendLoginOtp = async (req, res) => {
     }
 
     const now = Date.now();
-    const lastSent = loginOtpDoc.lastSentAt.getTime();
+    const lastSent = verification.lastSentAt.getTime();
     if (now - lastSent < RESEND_COOLDOWN_MS) {
       const waitSec = Math.ceil((RESEND_COOLDOWN_MS - (now - lastSent)) / 1000);
       return res.status(429).json({
         success: false,
-        message: `Please wait ${waitSec} seconds before requesting a new code.`,
+        message: `Please wait ${waitSec} seconds before requesting a new link.`,
         retryAfterSeconds: waitSec,
       });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpHash = await bcrypt.hash(otp, 10);
-    const expiresAt = new Date(Date.now() + LOGIN_OTP_EXPIRY_MS);
+    const displayCode = generateDisplayCode();
+    const verifyToken = generateVerifyToken();
+    const expiresAt = new Date(Date.now() + LOGIN_VERIFY_EXPIRY_MS);
     const lastSentAt = new Date();
 
-    loginOtpDoc.otpHash = otpHash;
-    loginOtpDoc.expiresAt = expiresAt;
-    loginOtpDoc.lastSentAt = lastSentAt;
-    loginOtpDoc.attempts = 0;
-    await loginOtpDoc.save();
+    verification.displayCode = displayCode;
+    verification.verifyToken = verifyToken;
+    verification.expiresAt = expiresAt;
+    verification.lastSentAt = lastSentAt;
+    verification.approvedAt = null;
+    await verification.save();
 
-    await sendOTPMail(otp, email, "login");
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    const approveLink = `${backendUrl}/api/v1/user/approve-login?token=${verifyToken}`;
+    await sendLoginConfirmMail(email, approveLink, displayCode);
 
     return res.status(200).json({
       success: true,
-      message: "New verification code sent to your email",
+      message: "New confirmation link sent to your email",
+      displayCode,
     });
   } catch (error) {
     return res.status(500).json({

@@ -7,13 +7,18 @@ import orderRoute from "./routes/orderRoute.js";
 import adminRoute from "./routes/adminRoute.js";
 import feedbackRoute from "./routes/feedbackRoute.js";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 const app = express();
 const PORT = process.env.PORT || 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 //middleware
 app.use(express.json());
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", product);

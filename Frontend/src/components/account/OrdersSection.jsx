@@ -9,11 +9,9 @@ const API_BASE = "http://localhost:8000/api/v1";
 
 const summaryCards = [
   { key: "total", label: "Total Orders", desc: "Orders placed", icon: Package, color: "bg-[#FF3F6C]/10 text-[#FF3F6C]" },
-  { key: "pending", label: "Pending", desc: "Awaiting processing", icon: Clock, color: "bg-amber-100 text-amber-700" },
-  { key: "processing", label: "Processing", desc: "Being processed", icon: Clock, color: "bg-blue-100 text-blue-700" },
-  { key: "shipped", label: "Shipped", desc: "On the way", icon: Package, color: "bg-indigo-100 text-indigo-700" },
-  { key: "delivered", label: "Delivered", desc: "Successfully delivered", icon: CheckCircle, color: "bg-emerald-100 text-emerald-700" },
+  { key: "pending", label: "Order", desc: "Pending / in progress", icon: Clock, color: "bg-amber-100 text-amber-700" },
   { key: "cancelled", label: "Cancelled", desc: "Cancelled orders", icon: XCircle, color: "bg-red-100 text-red-700" },
+  { key: "delivered", label: "Delivered", desc: "Successfully delivered", icon: CheckCircle, color: "bg-emerald-100 text-emerald-700" },
 ];
 
 export default function OrdersSection({ userId }) {
@@ -48,9 +46,7 @@ export default function OrdersSection({ userId }) {
 
   const stats = {
     total: orders.length,
-    pending: orders.filter((o) => o.orderStatus === "Pending").length,
-    processing: orders.filter((o) => o.orderStatus === "Processing").length,
-    shipped: orders.filter((o) => o.orderStatus === "Shipped").length,
+    pending: orders.filter((o) => ["Pending", "Processing", "Shipped"].includes(o.orderStatus)).length,
     delivered: orders.filter((o) => o.orderStatus === "Delivered").length,
     cancelled: orders.filter((o) => o.orderStatus === "Cancelled").length,
   };
@@ -70,7 +66,7 @@ export default function OrdersSection({ userId }) {
         <p className="text-gray-500 text-sm">View and track your order history.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {summaryCards.map(({ key, label, desc, icon: Icon, color }) => (
           <Card key={key} className="border-none shadow-md rounded-2xl bg-white/90 overflow-hidden">
             <CardContent className="p-5">

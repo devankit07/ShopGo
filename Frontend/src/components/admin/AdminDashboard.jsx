@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users, Package, ShoppingBag, DollarSign, TrendingUp, Percent } from "lucide-react";
+import { Users, Package, ShoppingBag, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { adminApi } from "@/lib/adminApi";
 import { Loader2 } from "lucide-react";
@@ -8,9 +8,7 @@ const cards = [
   { key: "totalUsers", label: "Total Users", desc: "Registered users", icon: Users, color: "bg-blue-500" },
   { key: "totalProducts", label: "Total Products", desc: "Products in catalog", icon: Package, color: "bg-emerald-500" },
   { key: "totalOrders", label: "Total Orders", desc: "Orders placed", icon: ShoppingBag, color: "bg-amber-500" },
-  { key: "totalRevenue", label: "Total Revenue", desc: "Total sales amount", icon: DollarSign, color: "bg-[#FF3F6C]" },
   { key: "totalSales", label: "Total Sales", desc: "Number of transactions", icon: TrendingUp, color: "bg-indigo-500" },
-  { key: "totalProfit", label: "Total Profit", desc: "Revenue minus cost", icon: Percent, color: "bg-teal-500" },
 ];
 
 export default function AdminDashboard() {
@@ -58,9 +56,7 @@ export default function AdminDashboard() {
                 <Icon className="w-6 h-6" />
               </div>
               <p className="text-2xl font-bold text-[#3E4152]">
-                {key === "totalRevenue" || key === "totalProfit"
-                  ? `₹${Number(stats?.[key] ?? 0).toLocaleString()}`
-                  : stats?.[key] ?? 0}
+                {stats?.[key] ?? 0}
               </p>
               <p className="font-medium text-[#3E4152]">{label}</p>
               <p className="text-xs text-gray-500 mt-0.5">{desc}</p>

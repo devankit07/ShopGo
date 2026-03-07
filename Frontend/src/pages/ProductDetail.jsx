@@ -18,6 +18,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(PLACEHOLDER_IMG);
 
   useEffect(() => {
     if (!productId) {
@@ -34,6 +35,11 @@ export default function ProductDetail() {
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [productId]);
+
+  useEffect(() => {
+    const images = product?.productImage?.map((img) => img?.url).filter(Boolean) || [];
+    setSelectedImage(images[0] || product?.imageUrl || PLACEHOLDER_IMG);
+  }, [product]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -97,8 +103,8 @@ export default function ProductDetail() {
   const description = product.productDesc || product.description || "";
   const price = product.productPrice ?? product.price;
   const category = product.category || "—";
-  const imageUrl =
-    product.productImage?.[0]?.url || product.imageUrl || PLACEHOLDER_IMG;
+  const imageUrls = product.productImage?.map((img) => img?.url).filter(Boolean) || [];
+  const activeImage = selectedImage || imageUrls[0] || product.imageUrl || PLACEHOLDER_IMG;
   const rating = product.rating ?? 4.5;
 
   return (
@@ -117,13 +123,34 @@ export default function ProductDetail() {
         </Button>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* Left: large product image */}
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
-            <img
-              src={imageUrl}
-              alt={name}
-              className="aspect-square w-full object-cover"
-            />
+          {/* Left: product image gallery */}
+          <div className="space-y-3">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <img
+                src={activeImage}
+                alt={name}
+                className="aspect-square w-full object-cover"
+              />
+            </div>
+            {imageUrls.length > 1 ? (
+              <div className="grid grid-cols-4 gap-2">
+                {imageUrls.map((url, idx) => (
+                  <button
+                    key={`${url}-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedImage(url)}
+                    className={`overflow-hidden rounded-xl border transition ${
+                      activeImage === url
+                        ? "border-[#FF3F6C] ring-1 ring-[#FF3F6C]"
+                        : "border-border hover:border-[#FF3F6C]/50"
+                    }`}
+                    aria-label={`Show product image ${idx + 1}`}
+                  >
+                    <img src={url} alt={`${name} ${idx + 1}`} className="aspect-square w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           {/* Right: details */}

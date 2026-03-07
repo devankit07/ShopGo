@@ -36,6 +36,9 @@ const Login = () => {
       );
       if (res.data.success && res.data.pendingToken) {
         sessionStorage.setItem("pendingToken", res.data.pendingToken);
+        if (res.data.displayCode) {
+          sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
+        }
         toast.success(res.data.message);
         navigate("/verify-otp", { replace: true });
       }

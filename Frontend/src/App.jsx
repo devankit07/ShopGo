@@ -17,6 +17,8 @@ import OrdersManagement from "./components/admin/OrdersManagement";
 import AdminLogs from "./pages/AdminLogs";
 import Feedback from "./pages/Feedback";
 import GiveFeedback from "./pages/GiveFeedback";
+import NotFound from "./pages/NotFound";
+import AdminRoute from "./components/AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +26,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <Home />
+        <main className="pb-20 md:pb-0">
+          <Home />
+        </main>
       </>
     ),
   },
@@ -57,7 +61,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <Products />
+        <main className="pb-20 md:pb-0">
+          <Products />
+        </main>
       </>
     ),
   },
@@ -66,7 +72,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <ProductDetail />
+        <main className="pb-20 md:pb-0">
+          <ProductDetail />
+        </main>
       </>
     ),
   },
@@ -75,7 +83,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <Cart />
+        <main className="pb-20 md:pb-0">
+          <Cart />
+        </main>
       </>
     ),
   },
@@ -84,7 +94,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <Profile />
+        <main className="pb-20 md:pb-0">
+          <Profile />
+        </main>
       </>
     ),
   },
@@ -93,7 +105,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <Feedback />
+        <main className="pb-20 md:pb-0">
+          <Feedback />
+        </main>
       </>
     ),
   },
@@ -102,13 +116,19 @@ const router = createBrowserRouter([
     element: (
       <>
         <Navbar />
-        <GiveFeedback />
+        <main className="pb-20 md:pb-0">
+          <GiveFeedback />
+        </main>
       </>
     ),
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <AdminRoute>
+        <AdminLayout />
+      </AdminRoute>
+    ),
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: "analytics", element: <SalesAnalytics /> },
@@ -116,7 +136,19 @@ const router = createBrowserRouter([
       { path: "products", element: <ProductsManagement /> },
       { path: "users", element: <UsersManagement /> },
       { path: "logs", element: <AdminLogs /> },
+      { path: "*", element: <NotFound inAdmin /> },
     ],
+  },
+  {
+    path: "*",
+    element: (
+      <>
+        <Navbar />
+        <main className="pb-20 md:pb-0">
+          <NotFound />
+        </main>
+      </>
+    ),
   },
 ]);
 

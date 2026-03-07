@@ -1,19 +1,16 @@
 import React, { useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 
-const BANNER_ITEMS = [
-  "🔥 Flash Deals – Limited Time Discounts",
-  "🚚 Free Shipping on Orders Above ₹999",
-  "⚡ Fast Checkout – Secure Payments",
-  "💎 Premium Products at Affordable Prices",
-  "🎁 Daily Surprise Offers for Members",
-];
+const BANNER_TEXT = "SHOP WITH US";
 
 const DealsBanner = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const repeatCount = 24;
+  const items = Array(repeatCount).fill(BANNER_TEXT);
 
   return (
     <section
-      className="relative py-4 overflow-hidden bg-[#262a30]"
+      className="relative py-3 overflow-hidden bg-teal-950/95 border-y border-teal-500/20"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -22,13 +19,14 @@ const DealsBanner = () => {
           className="flex animate-scroll-banner shrink-0 home-deals-track"
           style={{ animationPlayState: isPaused ? "paused" : "running" }}
         >
-          {[...BANNER_ITEMS, ...BANNER_ITEMS].map((text, i) => (
-            <div
+          {[...items, ...items].map((text, i) => (
+            <span
               key={i}
-              className="flex-shrink-0 mx-6 px-6 py-2.5 rounded-full border border-teal-400/40 bg-[#2d3136] text-white text-sm md:text-base font-medium whitespace-nowrap shadow-[0_0_24px_rgba(20,184,166,0.25)] hover:shadow-[0_0_32px_rgba(20,184,166,0.4)] hover:border-teal-400/60 transition-all duration-300 [text-shadow:0_0_20px_rgba(20,184,166,0.4)]"
+              className="flex items-center gap-2 flex-shrink-0 mx-8 text-white text-sm md:text-base font-bold uppercase tracking-widest whitespace-nowrap"
             >
               {text}
-            </div>
+              <ArrowUpRight className="w-4 h-4 flex-shrink-0 text-teal-300" aria-hidden />
+            </span>
           ))}
         </div>
       </div>

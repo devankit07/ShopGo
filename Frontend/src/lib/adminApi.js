@@ -32,8 +32,8 @@ export const adminApi = {
   updateOrderStatus: (orderId, orderStatus) =>
     axios.patch(`${API_BASE}/orders/${orderId}/status`, { orderStatus }, { headers: getAuthHeaders() }),
 
-  getProducts: () =>
-    axios.get(`${API_BASE}/products`, { headers: getAuthHeaders() }),
+  getProducts: (params = {}) =>
+    axios.get(`${API_BASE}/products`, { headers: getAuthHeaders(), params }),
 
   addProduct: (formData) =>
     axios.post(`${API_BASE}/products`, formData, {

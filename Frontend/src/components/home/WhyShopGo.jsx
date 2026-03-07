@@ -27,18 +27,21 @@ const WhyShopGo = () => {
           Why Choose <span className="text-teal-400">SHOP-GO</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {BENEFITS.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="group relative p-6 rounded-2xl bg-[#2d3136] border border-white/10 hover:border-teal-500/40 hover:shadow-[0_0_30px_rgba(20,184,166,0.12)] transition-all duration-300"
-            >
-              <div className="flex items-center justify-center w-14 h-14 rounded-xl border-2 border-teal-500/50 bg-teal-500/10 text-teal-400 group-hover:shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all duration-300">
-                <Icon className="w-7 h-7" />
+          {BENEFITS.map((benefit) => {
+            const Icon = benefit.icon;
+            return (
+              <div
+                key={benefit.title}
+                className="group relative p-6 rounded-2xl bg-[#2d3136] border border-white/10 hover:border-teal-500/40 hover:shadow-[0_0_30px_rgba(20,184,166,0.12)] transition-all duration-300"
+              >
+                <div className="flex items-center justify-center w-14 h-14 rounded-xl border-2 border-teal-500/50 bg-teal-500/10 text-teal-400 group-hover:shadow-[0_0_20px_rgba(20,184,166,0.3)] transition-all duration-300">
+                  <Icon className="w-7 h-7" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-white">{benefit.title}</h3>
+                <p className="mt-2 text-sm text-gray-400">{benefit.description}</p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
-              <p className="mt-2 text-sm text-gray-400">{description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

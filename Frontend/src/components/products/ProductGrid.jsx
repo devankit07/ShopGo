@@ -17,7 +17,7 @@ export default function ProductGrid({
       <>
         <div
           className={cn(
-            "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
+            "grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4",
             "animate-in fade-in duration-300"
           )}
         >
@@ -43,7 +43,7 @@ export default function ProductGrid({
     <>
       <div
         className={cn(
-          "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4",
+          "grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4",
           "animate-in fade-in duration-300"
         )}
       >
@@ -66,14 +66,14 @@ export default function ProductGrid({
 function ProductCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-      <div className="aspect-[4/3] animate-pulse bg-muted" />
-      <div className="flex flex-col gap-1.5 p-3">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+      <div className="aspect-[3/2] animate-pulse bg-muted" />
+      <div className="flex flex-col gap-0.5 p-2 pt-1.5">
+        <div className="h-3.5 w-3/4 animate-pulse rounded bg-muted" />
         <div className="h-3 w-full animate-pulse rounded bg-muted" />
-        <div className="mt-1 h-5 w-1/3 animate-pulse rounded bg-muted" />
+        <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
       </div>
-      <div className="p-3 pt-0">
-        <div className="h-9 w-full animate-pulse rounded-xl bg-muted" />
+      <div className="p-2 pt-1">
+        <div className="h-7 w-full animate-pulse rounded-lg bg-muted" />
       </div>
     </div>
   );

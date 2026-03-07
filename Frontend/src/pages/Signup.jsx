@@ -19,7 +19,8 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
   });
@@ -36,7 +37,12 @@ const Signup = () => {
       setLoading(true);
       const res = await axios.post(
         "http://localhost:8000/api/v1/user/register",
-        formData
+        {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+        }
       );
       if (res.data.success) {
         toast.success(res.data.message);
@@ -63,16 +69,31 @@ const Signup = () => {
         <CardContent>
           <form onSubmit={submitHandler} className="grid gap-5">
             <div className="grid gap-2">
-              <Label htmlFor="name" className="text-sm font-medium text-slate-300">
-                Name
+              <Label htmlFor="firstName" className="text-sm font-medium text-slate-300">
+                First name
               </Label>
               <Input
-                id="name"
-                name="name"
+                id="firstName"
+                name="firstName"
                 type="text"
-                placeholder="Your name"
+                placeholder="First name"
                 required
-                value={formData.name}
+                value={formData.firstName}
+                onChange={handleChange}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-pink-500 h-11"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="lastName" className="text-sm font-medium text-slate-300">
+                Last name
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Last name"
+                required
+                value={formData.lastName}
                 onChange={handleChange}
                 className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-pink-500 h-11"
               />

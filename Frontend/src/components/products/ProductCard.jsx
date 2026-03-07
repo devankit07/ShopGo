@@ -32,29 +32,29 @@ export default function ProductCard({ product }) {
             "transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl"
           )}
         >
-          <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+          <div className="relative aspect-[3/2] overflow-hidden bg-muted">
             <img
               src={imageUrl}
               alt={name}
               className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-110"
             />
           </div>
-          <CardContent className="flex flex-1 flex-col gap-1.5 p-3">
-            <h3 className="line-clamp-1 font-semibold text-foreground text-sm">{name}</h3>
-            <p className="line-clamp-1 text-xs text-muted-foreground">
+          <CardContent className="flex flex-col">
+            <h3 className="line-clamp-1 font-semibold text-foreground text-sm leading-tight">{name}</h3>
+            <p className="line-clamp-1 text-xs text-muted-foreground leading-tight">
               {description}
             </p>
-            <p className="mt-auto text-base font-bold text-[#FF3F6C]">
+            <p className="text-sm font-bold leading-tight text-[#FF3F6C]">
               ₹{Number(price).toLocaleString()}
             </p>
           </CardContent>
-          <CardFooter className="p-3 pt-0" onClick={(e) => e.preventDefault()}>
+          <CardFooter className="p-2 pt-1" onClick={(e) => e.preventDefault()}>
             <Button
               size="sm"
               onClick={handleAddToCartClick}
-              className="w-full rounded-xl bg-[#FF3F6C] font-semibold text-white hover:bg-[#e0355f]"
+              className="h-7 w-full rounded-lg bg-[#FF3F6C] text-xs font-semibold text-white hover:bg-[#e0355f]"
             >
-              <ShoppingCart className="mr-2 size-4" />
+              <ShoppingCart className="mr-1.5 size-3.5" />
               Add To Cart
             </Button>
           </CardFooter>

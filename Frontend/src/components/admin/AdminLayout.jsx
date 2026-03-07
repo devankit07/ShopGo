@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,9 +8,10 @@ import {
   Users,
   ClipboardList,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import axios from "axios";
 
@@ -33,29 +34,59 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.User);
+  const [isMobileView, setIsMobileView] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  const [showMobileMenu, setShowMobileMenu] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768 && location.pathname === "/admin"
+  );
 
   const logout = async () => {
     try {
       const token = localStorage.getItem("accesstoken");
       await axios.post("http://localhost:8000/api/v1/user/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
       dispatch(setUser(null));
+      localStorage.removeItem("user");
+      localStorage.removeItem("accesstoken");
+      localStorage.removeItem("refreshtoken");
       navigate("/login");
     } catch (_) {}
   };
 
-  if (!user) {
-    navigate("/login", { replace: true });
-    return null;
-  }
-  if (user?.role !== "admin") {
-    navigate("/", { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const handleViewportChange = () => setIsMobileView(mediaQuery.matches);
+    handleViewportChange();
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleViewportChange);
+      return () => mediaQuery.removeEventListener("change", handleViewportChange);
+    }
+
+    mediaQuery.addListener(handleViewportChange);
+    return () => mediaQuery.removeListener(handleViewportChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileView) {
+      setShowMobileMenu(false);
+    }
+  }, [isMobileView]);
+
+  const activeMenu = menu.find((item) => item.path === location.pathname);
+  const activeTitle = activeMenu?.label || "Dashboard";
+
+  const handleMobileMenuClose = () => {
+    if (isMobileView) setShowMobileMenu(false);
+  };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <aside className="w-64 shrink-0 bg-[#3E4152] text-white flex flex-col">
+    <div className="min-h-screen md:flex bg-gray-50">
+      <aside
+        className={`bg-[#3E4152] text-white flex flex-col ${
+          showMobileMenu ? "w-full min-h-screen" : "hidden"
+        } md:flex md:w-64 md:shrink-0 md:min-h-0`}
+      >
         <div className="p-6 border-b border-white/10">
           <BrandLogo />
           <p className="text-xs text-white/70 mt-1">Admin Panel</p>
@@ -68,6 +99,7 @@ export default function AdminLayout() {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={handleMobileMenuClose}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive ? "bg-[var(--brand-accent)] text-white" : "text-white/80 hover:bg-white/10 hover:text-white"
                 }`}
@@ -90,7 +122,19 @@ export default function AdminLayout() {
           </Button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto p-8">
+
+      <main className={`flex-1 overflow-auto ${showMobileMenu ? "hidden md:block" : "block"} p-4 md:p-8`}>
+        {isMobileView && !showMobileMenu ? (
+          <button
+            type="button"
+            onClick={() => setShowMobileMenu(true)}
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#3E4152] mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Admin
+          </button>
+        ) : null}
+        {isMobileView && !showMobileMenu ? <p className="text-xs text-gray-500 mb-4">{activeTitle}</p> : null}
         <Outlet />
       </main>
     </div>

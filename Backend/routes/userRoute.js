@@ -1,15 +1,18 @@
 import express from "express";
 import {
   allUser,
+  approveLogin,
   changePassword,
+  checkLoginVerification,
+  completeLogin,
+  completeLoginByToken,
   forgotPassword,
   getUserById,
   login,
   logout,
   register,
-  resendLoginOtp,
+  resendLoginVerification,
   updateuser,
-  verifyLoginOtp,
   verifyotp,
 } from "../controllers/userController.js";
 import { isAdmin, IsAuthenticated } from "../middleware/IsAuthenticated.js";
@@ -20,8 +23,11 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/verify-login-otp", verifyPendingLoginToken, verifyLoginOtp);
-router.post("/resend-login-otp", verifyPendingLoginToken, resendLoginOtp);
+router.get("/check-login-verification", verifyPendingLoginToken, checkLoginVerification);
+router.get("/approve-login", approveLogin);
+router.post("/complete-login", verifyPendingLoginToken, completeLogin);
+router.post("/complete-login-by-token", completeLoginByToken);
+router.post("/resend-login-verification", verifyPendingLoginToken, resendLoginVerification);
 router.post("/logout", IsAuthenticated, logout);
 router.post("/forgot-password", IsAuthenticated, forgotPassword);
 router.post("/verify-otp/:email", verifyotp);

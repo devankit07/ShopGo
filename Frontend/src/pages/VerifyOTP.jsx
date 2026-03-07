@@ -9,122 +9,182 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 
-const DIGITS = 6;
+const POLL_INTERVAL_MS = 2500;
 const RESEND_COOLDOWN_SEC = 30;
 
+const API_BASE = "http://localhost:8000/api/v1/user";
+
 const VerifyOTP = () => {
-  const [otp, setOtp] = useState(Array(DIGITS).fill(""));
+  const [displayCode, setDisplayCode] = useState(
+    () => sessionStorage.getItem("loginDisplayCode") || ""
+  );
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [error, setError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
-  const inputRefs = useRef([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const pollRef = useRef(null);
 
   const getPendingToken = () => sessionStorage.getItem("pendingToken");
 
+  // When the email link opens in a new tab, we have approved=1&loginToken but no pendingToken.
+  // Don't treat that as "session expired" – complete login with the one-time token instead.
+  const hasLoginTokenInUrl = () => {
+    const approved = searchParams.get("approved");
+    const loginToken = searchParams.get("loginToken");
+    return approved === "1" && !!loginToken;
+  };
+
   useEffect(() => {
+    if (hasLoginTokenInUrl()) return;
     if (!getPendingToken()) {
-      toast.error("Session expired. Please log in again.");
-      navigate("/login", { replace: true });
+      navigate("/login", { replace: true, state: { loginMessage: "Session expired. Please log in again." } });
       return;
     }
+  }, [navigate, searchParams]);
+
+  const completeLoginAndRedirect = useCallback(
+    async (accesstoken, refreshtoken, user) => {
+      sessionStorage.removeItem("pendingToken");
+      sessionStorage.removeItem("loginDisplayCode");
+      localStorage.setItem("accesstoken", accesstoken);
+      if (refreshtoken) localStorage.setItem("refreshtoken", refreshtoken);
+      localStorage.setItem("user", JSON.stringify(user));
+      dispatch(setUser(user));
+      if (user?.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+    },
+    [dispatch, navigate]
+  );
+
+  const callCompleteLogin = useCallback(async () => {
+    const token = getPendingToken();
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${API_BASE}/complete-login`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success && res.data.accesstoken) {
+        toast.success(res.data.message);
+        await completeLoginAndRedirect(
+          res.data.accesstoken,
+          res.data.refreshtoken,
+          res.data.user
+        );
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Could not complete login.");
+    } finally {
+      setLoading(false);
+    }
+  }, [completeLoginAndRedirect]);
+
+  // Handle redirect from email link (same tab or new tab)
+  useEffect(() => {
+    const approved = searchParams.get("approved");
+    const loginToken = searchParams.get("loginToken");
+    const error = searchParams.get("error");
+
+    if (error) {
+      const message =
+        error === "expired"
+          ? "Verification link expired. Please log in again."
+          : error === "missing_token"
+            ? "Invalid link."
+            : "Something went wrong. Please try again.";
+      setSearchParams({}, { replace: true });
+      navigate("/login", { replace: true, state: { loginMessage: message } });
+      return;
+    }
+
+    if (approved === "1" && loginToken) {
+      setSearchParams({}, { replace: true });
+      setLoading(true);
+      axios
+        .post(`${API_BASE}/complete-login-by-token`, { loginToken })
+        .then((res) => {
+          if (res.data.success && res.data.accesstoken) {
+            toast.success(res.data.message);
+            completeLoginAndRedirect(
+              res.data.accesstoken,
+              res.data.refreshtoken,
+              res.data.user
+            );
+          }
+        })
+        .catch((err) => {
+          toast.error(err.response?.data?.message || "Could not complete login.");
+          navigate("/login", { replace: true });
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
+    if (approved === "1" && !loginToken) {
+      setSearchParams({}, { replace: true });
+      callCompleteLogin();
+    }
+  }, [searchParams, setSearchParams, callCompleteLogin, completeLoginAndRedirect, navigate]);
+
+  // If the email link opened in another tab and completed login there, this tab can redirect to home (localStorage is shared)
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "accesstoken" && e.newValue) {
+        navigate("/", { replace: true });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [navigate]);
+
+  // Poll for verification (user clicked link in another tab/device)
+  useEffect(() => {
+    const token = getPendingToken();
+    if (!token || loading) return;
+
+    const poll = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/check-login-verification`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.data.success && res.data.verified) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          callCompleteLogin();
+        }
+        if (res.data.displayCode && !displayCode) {
+          setDisplayCode(res.data.displayCode);
+          sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
+        }
+      } catch {
+        // ignore poll errors
+      }
+    };
+
+    poll();
+    pollRef.current = setInterval(poll, POLL_INTERVAL_MS);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [loading, displayCode, callCompleteLogin]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((c) => c - 1), 1000);
     return () => clearInterval(t);
   }, [resendCooldown]);
-
-  const focusInput = (index) => {
-    inputRefs.current[index]?.focus();
-  };
-
-  const handleChange = (index, value) => {
-    if (value.length > 1) {
-      const pasted = value.replace(/\D/g, "").slice(0, DIGITS).split("");
-      const newOtp = [...otp];
-      pasted.forEach((d, i) => {
-        if (index + i < DIGITS) newOtp[index + i] = d;
-      });
-      setOtp(newOtp);
-      const next = Math.min(index + pasted.length, DIGITS - 1);
-      focusInput(next);
-      return;
-    }
-    const digit = value.replace(/\D/g, "").slice(-1);
-    const newOtp = [...otp];
-    newOtp[index] = digit;
-    setOtp(newOtp);
-    setError("");
-    if (digit && index < DIGITS - 1) focusInput(index + 1);
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      focusInput(index - 1);
-      const newOtp = [...otp];
-      newOtp[index - 1] = "";
-      setOtp(newOtp);
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, DIGITS);
-    if (!pasted) return;
-    const arr = pasted.split("");
-    const newOtp = [...otp];
-    arr.forEach((d, i) => { newOtp[i] = d; });
-    setOtp(newOtp);
-    focusInput(Math.min(arr.length, DIGITS - 1));
-    setError("");
-  };
-
-  const handleVerify = useCallback(async () => {
-    const token = getPendingToken();
-    if (!token) {
-      navigate("/login", { replace: true });
-      return;
-    }
-    const code = otp.join("");
-    if (code.length !== DIGITS) {
-      setError("Please enter the 6-digit code");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/api/v1/user/verify-login-otp",
-        { otp: code },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.data.success) {
-        sessionStorage.removeItem("pendingToken");
-        localStorage.setItem("accesstoken", res.data.accesstoken);
-        dispatch(setUser(res.data.user));
-        toast.success(res.data.message);
-        if (res.data.user?.role === "admin") {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/", { replace: true });
-        }
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Verification failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [otp, dispatch, navigate]);
 
   const handleResend = async () => {
     if (resendCooldown > 0) return;
@@ -134,32 +194,33 @@ const VerifyOTP = () => {
       return;
     }
     setResendLoading(true);
-    setError("");
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/user/resend-login-otp",
+        `${API_BASE}/resend-login-verification`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {
         toast.success(res.data.message);
         setResendCooldown(RESEND_COOLDOWN_SEC);
-        setOtp(Array(DIGITS).fill(""));
-        focusInput(0);
+        if (res.data.displayCode) {
+          setDisplayCode(res.data.displayCode);
+          sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
+        }
       } else {
-        setError(res.data.message || "Could not resend code.");
+        toast.error(res.data.message || "Could not resend.");
       }
     } catch (err) {
       const msg = err.response?.data?.message;
       const retry = err.response?.data?.retryAfterSeconds;
-      setError(msg || "Could not resend code.");
+      toast.error(msg || "Could not resend.");
       if (retry) setResendCooldown(retry);
     } finally {
       setResendLoading(false);
     }
   };
 
-  if (!getPendingToken()) return null;
+  if (!getPendingToken() && !hasLoginTokenInUrl()) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 transition-colors duration-300">
@@ -169,53 +230,33 @@ const VerifyOTP = () => {
             <ShieldCheck className="h-6 w-6 text-pink-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-white">
-            Enter verification code
+            Verify that it&apos;s you
           </CardTitle>
           <CardDescription className="text-slate-400">
-            We sent a 6-digit code to your email. Enter it below.
+            To help keep your account safe, we want to make sure it&apos;s really you.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex justify-center gap-2 sm:gap-3">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={index === 0 ? handlePaste : undefined}
-                className="h-12 w-10 sm:w-12 rounded-lg border border-slate-600 bg-slate-800 text-center text-lg font-semibold text-white outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-500/30"
-                aria-label={`Digit ${index + 1}`}
-              />
-            ))}
-          </div>
-          {error && (
-            <p className="text-center text-sm text-red-400" role="alert">
-              {error}
-            </p>
+          {displayCode && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-slate-400 text-sm">Your verification code</span>
+              <div className="text-5xl font-bold tabular-nums text-white tracking-widest bg-slate-800 border border-slate-600 rounded-xl px-8 py-4">
+                {displayCode}
+              </div>
+            </div>
           )}
-          <Button
-            disabled={loading || otp.join("").length !== DIGITS}
-            onClick={handleVerify}
-            className="w-full h-11 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-all duration-200"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Verifying...
-              </>
-            ) : (
-              "Verify"
-            )}
-          </Button>
+          <p className="text-center text-slate-400 text-sm">
+            We sent a confirmation link to your email. Open the link and tap <strong className="text-white">Yes, it&apos;s me</strong>, then confirm the code <strong className="text-white">{displayCode || "—"}</strong> to continue.
+          </p>
+          {loading && (
+            <div className="flex justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-pink-400" />
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4 border-t border-slate-700 pt-6">
           <p className="text-sm text-slate-400 text-center">
-            Didn&apos;t receive the code?{" "}
+            Didn&apos;t get the email?{" "}
             <Button
               variant="link"
               className="p-0 h-auto font-semibold text-pink-400 hover:text-pink-300 disabled:opacity-50"
@@ -226,8 +267,11 @@ const VerifyOTP = () => {
                 ? `Resend in ${resendCooldown}s`
                 : resendLoading
                 ? "Sending..."
-                : "Resend OTP"}
+                : "Resend link"}
             </Button>
+          </p>
+          <p className="text-xs text-slate-500 text-center">
+            Need help? Open the link we sent to your email and approve the login.
           </p>
         </CardFooter>
       </Card>

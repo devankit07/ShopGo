@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import { selectCartCount } from "@/redux/cartSlice";
+import MobileBottomNav from "./MobileBottomNav";
 
 const BRAND_LOGO = (
   <img
@@ -47,6 +48,9 @@ const Navbar = () => {
       );
       if (response.data.success) {
         dispatch(setUser(null));
+        localStorage.removeItem("user");
+        localStorage.removeItem("accesstoken");
+        localStorage.removeItem("refreshtoken");
         toast.success(response.data.message);
       }
     } catch (error) {
@@ -54,6 +58,7 @@ const Navbar = () => {
     }
   };
   return (
+    <>
     <header className="fixed top-0 left-0 w-full z-20 transition-[background,border,box-shadow] duration-300">
       <div
         className={`max-w-7xl mx-auto flex justify-between items-center py-3 px-6 transition-all duration-300 ${
@@ -204,6 +209,8 @@ const Navbar = () => {
         </nav>
       </div>
     </header>
+    <MobileBottomNav />
+    </>
   );
 };
 

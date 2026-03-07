@@ -19,7 +19,7 @@ export const verifyPendingLoginToken = (req, res, next) => {
     }
 
     const decoded = jwt.verify(pendingToken, process.env.SECRET_KEY);
-    if (decoded.purpose !== "login_otp" || !decoded.email) {
+    if ((decoded.purpose !== "login_otp" && decoded.purpose !== "login_verify") || !decoded.email) {
       return res.status(401).json({
         success: false,
         message: "Invalid verification session. Please log in again.",

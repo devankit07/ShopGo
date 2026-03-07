@@ -10,14 +10,11 @@ const QUICK_LINKS = [
 
 const CUSTOMER_SUPPORT = [
   { label: "Help Center", href: "#" },
-  { label: "Shipping Info", href: "#" },
-  { label: "Returns Policy", href: "#" },
   { label: "Contact", href: "#" },
 ];
 
 const CATEGORIES = [
   { label: "Electronics", to: "/products?category=electronics" },
-  { label: "Electric Vehicles", to: "/products?category=electric-vehicles" },
   { label: "Jewellery", to: "/products?category=jewellery" },
   { label: "Accessories", to: "/products?category=accessories" },
 ];

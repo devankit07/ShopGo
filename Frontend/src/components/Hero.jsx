@@ -26,7 +26,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 mt-10">
             <Button
               asChild
-              className="h-12 px-8 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold shadow-lg shadow-teal-500/30 hover:shadow-teal-500/40 hover:opacity-95 transition-all"
+              className="h-12 px-8 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold"
             >
               <Link to="/products">Shop Now</Link>
             </Button>

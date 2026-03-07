@@ -10,7 +10,7 @@ export const addProduct = async (req, res) => {
       req.body;
     const userId = req.id;
 
-    if (!productName || !productDesc || !productPrice || !category || !brand) {
+    if (!productName || !productDesc || !productPrice || !category) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
