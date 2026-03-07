@@ -1,4 +1,5 @@
 import { Order } from "../models/orderModel.js";
+import { Notification } from "../models/Notification.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -24,6 +25,11 @@ export const createOrder = async (req, res) => {
       totalAmount: Number(totalAmount),
       shippingAddress: shippingAddress || {},
       paymentMethod: paymentMethod || "Card",
+    });
+    await Notification.create({
+      message: `New order placed for ₹${Number(totalAmount)}`,
+      type: "order",
+      isRead: false,
     });
     const populated = await Order.findById(order._id).populate("userId", "firstName lastName email");
     return res.status(201).json({

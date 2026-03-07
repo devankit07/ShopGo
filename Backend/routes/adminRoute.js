@@ -9,6 +9,8 @@ import {
   getAllOrders,
   updateOrderStatus,
   getActionLogs,
+  getNotifications,
+  markNotificationRead,
 } from "../controllers/adminController.js";
 import {
   addProduct,
@@ -25,6 +27,8 @@ router.use(IsAuthenticated, isAdmin);
 router.get("/dashboard-stats", getDashboardStats);
 router.get("/analytics", getSalesAnalytics);
 router.get("/logs", getActionLogs);
+router.get("/notifications", getNotifications);
+router.put("/notifications/read/:id", markNotificationRead);
 
 router.get("/users", getAdminUsers);
 router.patch("/users/:id/role", updateUserRole);

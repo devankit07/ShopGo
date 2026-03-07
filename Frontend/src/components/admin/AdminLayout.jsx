@@ -9,11 +9,13 @@ import {
   ClipboardList,
   LogOut,
   ArrowLeft,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import axios from "axios";
+import { adminApi } from "@/lib/adminApi";
 
 const BrandLogo = () => (
   <Link to="/" className="inline-block">
@@ -38,6 +40,8 @@ export default function AdminLayout() {
   const [showMobileMenu, setShowMobileMenu] = useState(
     () => typeof window !== "undefined" && window.innerWidth < 768 && location.pathname === "/admin"
   );
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const logout = async () => {
     try {
@@ -73,11 +77,50 @@ export default function AdminLayout() {
     }
   }, [isMobileView]);
 
+  useEffect(() => {
+    let mounted = true;
+    const fetchNotifications = async () => {
+      try {
+        const res = await adminApi.getNotifications();
+        if (mounted && res.data?.success) {
+          setNotifications(Array.isArray(res.data.notifications) ? res.data.notifications : []);
+        }
+      } catch {
+        // ignore notification fetch errors
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 20000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    setShowNotifications(false);
+  }, [location.pathname]);
+
   const activeMenu = menu.find((item) => item.path === location.pathname);
   const activeTitle = activeMenu?.label || "Dashboard";
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleMobileMenuClose = () => {
     if (isMobileView) setShowMobileMenu(false);
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await adminApi.markNotificationRead(notificationId);
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item._id === notificationId ? { ...item, isRead: true } : item
+        )
+      );
+    } catch {
+      // keep silent
+    }
   };
 
   return (
@@ -124,6 +167,66 @@ export default function AdminLayout() {
       </aside>
 
       <main className={`flex-1 overflow-auto ${showMobileMenu ? "hidden md:block" : "block"} p-4 md:p-8`}>
+        <div className="mb-4 md:mb-6 flex items-center justify-between gap-3">
+          <div>
+            {!isMobileView ? (
+              <>
+                <h1 className="text-2xl font-bold text-[#3E4152]">{activeTitle}</h1>
+                <p className="text-sm text-gray-500">Admin dashboard</p>
+              </>
+            ) : null}
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowNotifications((v) => !v)}
+              className="relative inline-flex items-center justify-center h-10 w-10 rounded-full bg-white border border-gray-200 text-[#3E4152] hover:bg-gray-50 transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 ? (
+                <span className="absolute top-1.5 right-1.5 inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+              ) : null}
+            </button>
+
+            {showNotifications ? (
+              <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="font-semibold text-[#3E4152]">Notifications</p>
+                  <p className="text-xs text-gray-500">
+                    {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+                  </p>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <p className="px-4 py-4 text-sm text-gray-500">No notifications yet.</p>
+                  ) : (
+                    notifications.map((item) => (
+                      <button
+                        type="button"
+                        key={item._id}
+                        onClick={() => markAsRead(item._id)}
+                        className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-b-0 transition-colors ${
+                          item.isRead ? "bg-white" : "bg-red-50/50 hover:bg-red-50"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-sm text-[#3E4152]">{item.message}</p>
+                          {!item.isRead ? (
+                            <span className="mt-1 inline-block h-2 w-2 rounded-full bg-red-500 shrink-0" />
+                          ) : null}
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {new Date(item.createdAt).toLocaleString("en-IN")}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
         {isMobileView && !showMobileMenu ? (
           <button
             type="button"

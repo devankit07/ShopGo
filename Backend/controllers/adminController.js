@@ -2,6 +2,7 @@ import { User } from "../models/userModel.js";
 import { Order } from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import { AdminActionLog } from "../models/adminActionLogModel.js";
+import { Notification } from "../models/Notification.js";
 import { logAction } from "../utils/adminLog.js";
 
 export const getDashboardStats = async (req, res) => {
@@ -117,7 +118,7 @@ export const getSalesAnalytics = async (req, res) => {
 export const getAdminUsers = async (req, res) => {
   try {
     const users = await User.find()
-      .select("-password -otp -otpExpiry -token")
+      .select("-password -resetToken -resetTokenExpiry")
       .lean();
     const orderCounts = await Order.aggregate([
       { $group: { _id: "$userId", count: { $sum: 1 } } },
@@ -260,4 +261,46 @@ export const getActionLogs = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
+
+export const getNotifications = async (req, res) => {
+  try {
+    const notifications = await Notification.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      notifications,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const markNotificationRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notification = await Notification.findByIdAndUpdate(
+      id,
+      { isRead: true },
+      { new: true }
+    );
+
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Notification marked as read",
+      notification,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

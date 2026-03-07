@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendResetPasswordMail } from "../emialiVerify/sendResetPasswordMail.js";
+import { Notification } from "../models/Notification.js";
 import cloudinary from "../utils/cloudinary.js";
 
 // ─── AUTH ────────────────────────────────────────────────────────────────────
@@ -33,6 +34,12 @@ export const register = async (req, res) => {
       lastName: (lastName || "").trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
+    });
+
+    await Notification.create({
+      message: `New user registered: ${newUser.email}`,
+      type: "user",
+      isRead: false,
     });
 
     const userResponse = newUser.toObject();
