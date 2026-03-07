@@ -14,7 +14,6 @@ const loginVerificationSchema = new mongoose.Schema(
 );
 
 loginVerificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-loginVerificationSchema.index({ verifyToken: 1 });
 
 export const LoginVerification = mongoose.model("LoginVerification", loginVerificationSchema);
 
