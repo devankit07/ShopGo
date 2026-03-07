@@ -3,7 +3,8 @@ import Navbar from "./components/ui/Navbar";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
-import VerifyOTP from "./pages/VerifyOTP.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 import Profile from "./components/Profile";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -34,27 +35,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: (
-      <>
-        <Signup />
-      </>
-    ),
+    element: <Signup />,
   },
   {
     path: "/login",
-    element: (
-      <>
-        <Login />
-      </>
-    ),
+    element: <Login />,
   },
   {
-    path: "/verify-otp",
-    element: (
-      <>
-        <VerifyOTP />
-      </>
-    ),
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
   {
     path: "/products",
@@ -153,11 +146,7 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

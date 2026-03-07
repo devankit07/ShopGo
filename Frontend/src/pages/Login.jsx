@@ -14,12 +14,15 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/userslice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,13 +34,15 @@ const Login = () => {
     try {
       setLoading(true);
       const res = await axios.post("/api/v1/user/login", formData);
-      if (res.data.success && res.data.pendingToken) {
-        sessionStorage.setItem("pendingToken", res.data.pendingToken);
-        if (res.data.displayCode) {
-          sessionStorage.setItem("loginDisplayCode", res.data.displayCode);
-        }
+      if (res.data.success) {
+        localStorage.setItem("accesstoken", res.data.accesstoken);
+        dispatch(setUser(res.data.user));
         toast.success(res.data.message);
-        navigate("/verify-otp", { replace: true });
+        if (res.data.user?.role === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -75,9 +80,17 @@ const Login = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password" className="text-sm font-medium text-slate-300">
-                Password
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-sm font-medium text-slate-300">
+                  Password
+                </Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-pink-400 hover:text-pink-300 hover:underline transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
