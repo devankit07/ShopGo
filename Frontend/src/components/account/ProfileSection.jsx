@@ -19,7 +19,7 @@ import { setUser } from "@/redux/userslice";
 const API_BASE = "/api/v1";
 
 export default function ProfileSection({ userId }) {
-  const user = useSelector((store) => store.user);
+  const user = useSelector((store) => store.User?.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -29,6 +29,7 @@ export default function ProfileSection({ userId }) {
     firstName: "",
     lastName: "",
     email: "",
+    role: "user",
     phoneNo: "",
     address: "",
     city: "",
@@ -46,6 +47,7 @@ export default function ProfileSection({ userId }) {
           firstName: saved.firstName ?? "",
           lastName: saved.lastName ?? "",
           email: saved.email ?? "",
+          role: saved.role ?? "user",
           phoneNo: saved.phoneNo ?? "",
           address: saved.address ?? "",
           city: saved.city ?? "",
@@ -64,6 +66,7 @@ export default function ProfileSection({ userId }) {
           firstName: saved.firstName ?? "",
           lastName: saved.lastName ?? "",
           email: saved.email ?? "",
+          role: saved.role ?? "user",
           phoneNo: saved.phoneNo ?? "",
           address: saved.address ?? "",
           city: saved.city ?? "",
@@ -84,6 +87,7 @@ export default function ProfileSection({ userId }) {
             firstName: u.firstName ?? "",
             lastName: u.lastName ?? "",
             email: u.email ?? "",
+            role: u.role ?? "user",
             phoneNo: u.phoneNo ?? "",
             address: u.address ?? "",
             city: u.city ?? "",
@@ -101,6 +105,7 @@ export default function ProfileSection({ userId }) {
             firstName: saved.firstName ?? "",
             lastName: saved.lastName ?? "",
             email: saved.email ?? "",
+            role: saved.role ?? "user",
             phoneNo: saved.phoneNo ?? "",
             address: saved.address ?? "",
             city: saved.city ?? "",
@@ -160,6 +165,7 @@ export default function ProfileSection({ userId }) {
           firstName: u.firstName ?? prev.firstName,
           lastName: u.lastName ?? prev.lastName,
           email: u.email ?? prev.email,
+          role: u.role ?? prev.role,
           phoneNo: u.phoneNo ?? prev.phoneNo,
           address: u.address ?? prev.address,
           city: u.city ?? prev.city,
@@ -198,6 +204,17 @@ export default function ProfileSection({ userId }) {
         <CardDescription className="text-gray-600">
           Update your personal information below.
         </CardDescription>
+        <div className="mt-2">
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
+              updateUser.role === "admin"
+                ? "bg-[#FF3F6C]/15 text-[#FF3F6C]"
+                : "bg-teal-500/15 text-teal-700"
+            }`}
+          >
+            Role: {updateUser.role === "admin" ? "Admin" : "User"}
+          </span>
+        </div>
       </CardHeader>
       <CardContent className="pt-8">
         <div className="flex flex-col md:flex-row gap-10 items-start">
@@ -250,6 +267,15 @@ export default function ProfileSection({ userId }) {
               <Input
                 type="email"
                 value={updateUser.email}
+                disabled
+                className="bg-gray-100 cursor-not-allowed text-gray-700"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-700">Account Type</Label>
+              <Input
+                type="text"
+                value={updateUser.role === "admin" ? "Admin" : "User"}
                 disabled
                 className="bg-gray-100 cursor-not-allowed text-gray-700"
               />

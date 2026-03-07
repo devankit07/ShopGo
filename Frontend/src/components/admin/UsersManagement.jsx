@@ -10,7 +10,41 @@ export default function UsersManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [acting, setActing] = useState(null);
+  const [dateFilter, setDateFilter] = useState("all");
   const currentUserId = useSelector((state) => state.User?.user?._id);
+
+  const getFilteredUsers = () => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    return users.filter((u) => {
+      const created = u.createdAt ? new Date(u.createdAt) : null;
+      if (!created) return false;
+
+      if (dateFilter === "all") return true;
+      if (dateFilter === "today") return created >= startOfToday;
+
+      if (dateFilter === "last7") {
+        const last7 = new Date(startOfToday);
+        last7.setDate(last7.getDate() - 7);
+        return created >= last7;
+      }
+
+      if (dateFilter === "last30") {
+        const last30 = new Date(startOfToday);
+        last30.setDate(last30.getDate() - 30);
+        return created >= last30;
+      }
+
+      if (dateFilter === "older") {
+        const last30 = new Date(startOfToday);
+        last30.setDate(last30.getDate() - 30);
+        return created < last30;
+      }
+
+      return true;
+    });
+  };
 
   const fetchUsers = () => {
     setLoading(true);
@@ -54,6 +88,8 @@ export default function UsersManagement() {
       .finally(() => setActing(null));
   };
 
+  const filteredUsers = getFilteredUsers();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -67,6 +103,22 @@ export default function UsersManagement() {
       <div>
         <h1 className="text-2xl font-bold text-[#3E4152]">User Management</h1>
         <p className="text-gray-500 text-sm mt-1">View and manage users</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm font-medium text-[#3E4152]">Filter by date:</label>
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-[#3E4152]"
+        >
+          <option value="all">All</option>
+          <option value="today">Today</option>
+          <option value="last7">Last 7 days</option>
+          <option value="last30">Last 30 days</option>
+          <option value="older">Older than 30 days</option>
+        </select>
+        <p className="text-xs text-gray-500">{filteredUsers.length} user(s)</p>
       </div>
 
       {error && (
@@ -85,11 +137,12 @@ export default function UsersManagement() {
                 <th className="px-4 py-3 text-sm font-semibold text-[#3E4152]">Email</th>
                 <th className="px-4 py-3 text-sm font-semibold text-[#3E4152]">Role</th>
                 <th className="px-4 py-3 text-sm font-semibold text-[#3E4152]">Orders Count</th>
+                <th className="px-4 py-3 text-sm font-semibold text-[#3E4152]">Joined</th>
                 <th className="px-4 py-3 text-sm font-semibold text-[#3E4152]">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {filteredUsers.map((u) => (
                 <tr key={u._id} className="border-b border-gray-100 hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-sm font-mono text-gray-600">{u._id?.slice(-8)}</td>
                   <td className="px-4 py-3 text-sm text-[#3E4152]">{[u.firstName, u.lastName].filter(Boolean).join(" ") || "—"}</td>
@@ -100,6 +153,9 @@ export default function UsersManagement() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-[#3E4152]">{u.ordersCount ?? 0}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 flex-wrap">
                       {u.role !== "admin" ? (
@@ -141,9 +197,9 @@ export default function UsersManagement() {
             </tbody>
           </table>
         </div>
-        {users.length === 0 && (
+        {filteredUsers.length === 0 && (
           <div className="p-12 text-center text-gray-500">
-            No users found.
+            No users found for selected date range.
           </div>
         )}
       </div>

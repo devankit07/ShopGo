@@ -31,6 +31,40 @@ export default function OrdersManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(null);
+  const [dateFilter, setDateFilter] = useState("all");
+
+  const getFilteredOrders = () => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    return orders.filter((order) => {
+      const created = order.createdAt ? new Date(order.createdAt) : null;
+      if (!created) return false;
+
+      if (dateFilter === "all") return true;
+      if (dateFilter === "today") return created >= startOfToday;
+
+      if (dateFilter === "last7") {
+        const last7 = new Date(startOfToday);
+        last7.setDate(last7.getDate() - 7);
+        return created >= last7;
+      }
+
+      if (dateFilter === "last30") {
+        const last30 = new Date(startOfToday);
+        last30.setDate(last30.getDate() - 30);
+        return created >= last30;
+      }
+
+      if (dateFilter === "older") {
+        const last30 = new Date(startOfToday);
+        last30.setDate(last30.getDate() - 30);
+        return created < last30;
+      }
+
+      return true;
+    });
+  };
 
   const fetchOrders = () => {
     setLoading(true);
@@ -59,6 +93,8 @@ export default function OrdersManagement() {
       .finally(() => setUpdating(null));
   };
 
+  const filteredOrders = getFilteredOrders();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -72,6 +108,22 @@ export default function OrdersManagement() {
       <div>
         <h1 className="text-2xl font-bold text-[#3E4152]">Order Management</h1>
         <p className="text-gray-500 text-sm mt-1">Update order status</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm font-medium text-[#3E4152]">Filter by date:</label>
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-[#3E4152]"
+        >
+          <option value="all">All</option>
+          <option value="today">Today</option>
+          <option value="last7">Last 7 days</option>
+          <option value="last30">Last 30 days</option>
+          <option value="older">Older than 30 days</option>
+        </select>
+        <p className="text-xs text-gray-500">{filteredOrders.length} order(s)</p>
       </div>
 
       {error && (
@@ -96,7 +148,7 @@ export default function OrdersManagement() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => {
+              {filteredOrders.map((order) => {
                 const user = order.userId;
                 const name = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "—";
                 const first = getFirstProduct(order);
@@ -138,10 +190,10 @@ export default function OrdersManagement() {
             </tbody>
           </table>
         </div>
-        {orders.length === 0 && (
+        {filteredOrders.length === 0 && (
           <div className="p-12 text-center text-gray-500 flex flex-col items-center gap-2">
             <Package className="w-12 h-12 text-gray-300" />
-            No orders yet.
+            No orders found for selected date range.
           </div>
         )}
       </div>
