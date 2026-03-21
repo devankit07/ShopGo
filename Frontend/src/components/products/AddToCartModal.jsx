@@ -82,7 +82,7 @@ export default function AddToCartModal({ open, onClose, product }) {
             <h2 id="add-to-cart-title" className="text-lg font-semibold text-foreground">
               {name}
             </h2>
-            <p className="text-[#FF3F6C] font-bold">₹{Number(price).toLocaleString()}</p>
+            <p className="text-[#FC8019] font-bold">₹{Number(price).toLocaleString()}</p>
             <div className="mt-4 flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Quantity</span>
               <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-1">
@@ -123,7 +123,7 @@ export default function AddToCartModal({ open, onClose, product }) {
             Cancel
           </Button>
           <Button
-            className="flex-1 rounded-xl bg-[#FF3F6C] text-white hover:bg-[#e0355f]"
+            className="flex-1 rounded-xl bg-[#FC8019] text-white hover:bg-[#ea7310]"
             onClick={handleAdd}
           >
             Add To Cart

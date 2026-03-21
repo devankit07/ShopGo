@@ -10,7 +10,7 @@ const DealsBanner = () => {
 
   return (
     <section
-      className="relative py-3 overflow-hidden bg-teal-950/95 border-y border-teal-500/20"
+      className="relative py-3 overflow-hidden bg-[#fc8019] border-y border-[#ea7310]/30"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -25,7 +25,7 @@ const DealsBanner = () => {
               className="flex items-center gap-2 flex-shrink-0 mx-8 text-white text-sm md:text-base font-bold uppercase tracking-widest whitespace-nowrap"
             >
               {text}
-              <ArrowUpRight className="w-4 h-4 flex-shrink-0 text-teal-300" aria-hidden />
+              <ArrowUpRight className="w-4 h-4 flex-shrink-0 text-white/90" aria-hidden />
             </span>
           ))}
         </div>

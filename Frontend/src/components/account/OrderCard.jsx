@@ -59,7 +59,7 @@ export default function OrderCard({ order }) {
             <Button
               variant="outline"
               size="sm"
-              className="mt-2 text-[#FF3F6C] border-[#FF3F6C]/30 hover:bg-[#FF3F6C]/10 hover:text-[#FF3F6C]"
+              className="mt-2 text-[#FC8019] border-[#FC8019]/30 hover:bg-[#FC8019]/10 hover:text-[#FC8019]"
               onClick={() => setShowModal(true)}
             >
               <Eye className="w-4 h-4 mr-1" />

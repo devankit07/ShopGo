@@ -8,7 +8,7 @@ import axios from "axios";
 const API_BASE = "/api/v1";
 
 const summaryCards = [
-  { key: "total", label: "Total Orders", desc: "Orders placed", icon: Package, color: "bg-[#FF3F6C]/10 text-[#FF3F6C]" },
+  { key: "total", label: "Total Orders", desc: "Orders placed", icon: Package, color: "bg-[#FC8019]/10 text-[#FC8019]" },
   { key: "pending", label: "Order", desc: "Pending / in progress", icon: Clock, color: "bg-amber-100 text-amber-700" },
   { key: "cancelled", label: "Cancelled", desc: "Cancelled orders", icon: XCircle, color: "bg-red-100 text-red-700" },
   { key: "delivered", label: "Delivered", desc: "Successfully delivered", icon: CheckCircle, color: "bg-emerald-100 text-emerald-700" },
@@ -54,7 +54,7 @@ export default function OrdersSection({ userId }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-10 w-10 animate-spin text-[#FF3F6C]" />
+        <Loader2 className="h-10 w-10 animate-spin text-[#FC8019]" />
       </div>
     );
   }

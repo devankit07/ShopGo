@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { adminApi } from "@/lib/adminApi";
-import { PRODUCT_CATEGORIES } from "@/components/products/ProductFilter";
+import { PRODUCT_CATEGORIES, FASHION_SIZES } from "@/components/products/productCategories";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Pencil, Trash2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const ADMIN_CATEGORIES = PRODUCT_CATEGORIES.filter((c) => c !== "All");
+const STATIC_CATEGORIES = PRODUCT_CATEGORIES.filter((c) => c !== "All");
 const PAGE_SIZE = 6;
 
 const API_BASE = "/api/admin";
@@ -82,7 +82,7 @@ export default function ProductsManagement() {
           <p className="text-gray-500 text-sm mt-1">Add, edit, delete products</p>
         </div>
         <Button
-          className="bg-[#FF3F6C] hover:bg-[#e0355f]"
+          className="bg-[#FC8019] hover:bg-[#ea7310]"
           onClick={() => setModal("add")}
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -109,7 +109,7 @@ export default function ProductsManagement() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="h-10 w-10 animate-spin text-[#FF3F6C]" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#FC8019]" />
         </div>
       ) : (
         <>
@@ -132,7 +132,7 @@ export default function ProductsManagement() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1 text-[#FF3F6C] border-[#FF3F6C]/30"
+                      className="flex-1 text-[#FC8019] border-[#FC8019]/30"
                       onClick={() => setModal({ type: "edit", product: p })}
                     >
                       <Pencil className="w-4 h-4 mr-1" />
@@ -178,7 +178,7 @@ export default function ProductsManagement() {
                   type="button"
                   size="sm"
                   variant={currentPage === page ? "default" : "outline"}
-                  className={currentPage === page ? "bg-[#FF3F6C] hover:bg-[#e0355f]" : ""}
+                  className={currentPage === page ? "bg-[#FC8019] hover:bg-[#ea7310]" : ""}
                   onClick={() => setCurrentPage(page)}
                 >
                   {page}
@@ -219,16 +219,77 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
   const isAdd = modal === "add";
   const editProduct = modal?.type === "edit" ? modal.product : null;
   const [loading, setLoading] = useState(false);
+  const [dbCategories, setDbCategories] = useState([]);
+  const [useNewCategory, setUseNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [form, setForm] = useState({
-    productName: editProduct?.productName ?? "",
-    productDesc: editProduct?.productDesc ?? "",
-    productPrice: editProduct?.productPrice ?? "",
-    category: editProduct?.category ?? "",
-    brand: editProduct?.brand ?? "",
+    productName: "",
+    productDesc: "",
+    productPrice: "",
+    category: "",
+    brand: "",
+    size: "",
   });
   const [files, setFiles] = useState([]);
   const existingImageCount = editProduct?.productImage?.length || 0;
   const fileInputRef = useRef(null);
+
+  const mergedCategoryOptions = useMemo(
+    () =>
+      [...new Set([...STATIC_CATEGORIES, ...dbCategories])].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+    [dbCategories]
+  );
+
+  useEffect(() => {
+    if (!modal) return;
+    axios
+      .get("/api/products/categories")
+      .then((res) => {
+        setDbCategories(Array.isArray(res.data?.categories) ? res.data.categories : []);
+      })
+      .catch(() => setDbCategories([]));
+  }, [modal]);
+
+  useEffect(() => {
+    if (!modal) return;
+    setFiles([]);
+    setUseNewCategory(false);
+    setNewCategoryName("");
+    if (isAdd) {
+      setForm({
+        productName: "",
+        productDesc: "",
+        productPrice: "",
+        category: "",
+        brand: "",
+        size: "",
+      });
+    } else if (editProduct) {
+      setForm({
+        productName: editProduct.productName ?? "",
+        productDesc: editProduct.productDesc ?? "",
+        productPrice: editProduct.productPrice ?? "",
+        category: editProduct.category ?? "",
+        brand: editProduct.brand ?? "",
+        size: editProduct.size ?? "",
+      });
+    }
+  }, [modal, isAdd, editProduct?._id]);
+
+  useEffect(() => {
+    if (!modal || isAdd || !editProduct) return;
+    const merged = [...new Set([...STATIC_CATEGORIES, ...dbCategories])];
+    const cat = editProduct.category || "";
+    if (cat && !merged.includes(cat)) {
+      setUseNewCategory(true);
+      setNewCategoryName(cat);
+    } else {
+      setUseNewCategory(false);
+      setNewCategoryName("");
+    }
+  }, [modal, isAdd, editProduct?._id, dbCategories, editProduct]);
 
   const handleFilesChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -261,13 +322,22 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
     const token = localStorage.getItem("accesstoken");
     if (!token) return;
 
+    const categoryValue = useNewCategory
+      ? newCategoryName.trim()
+      : form.category.trim();
+    if (!categoryValue) {
+      toast.error("Please select a category or enter a new one.");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append("productName", form.productName);
     formData.append("productDesc", form.productDesc);
     formData.append("productPrice", form.productPrice);
-    formData.append("category", form.category);
+    formData.append("category", categoryValue);
     formData.append("brand", form.brand);
+    formData.append("size", categoryValue === "Fashion" ? (form.size || "") : "");
     files.forEach((file) => formData.append("files", file));
     if (editProduct?.productImage?.length) {
       formData.append("existingImages", JSON.stringify(editProduct.productImage.map((i) => i.public_id)));
@@ -325,17 +395,55 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
             </div>
             <div>
               <Label>Category</Label>
-              <select
-                value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                required
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
-              >
-                <option value="">Select category</option>
-                {ADMIN_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
+              <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-[#3E4152]">
+                <input
+                  type="checkbox"
+                  checked={useNewCategory}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setUseNewCategory(on);
+                    if (on) setNewCategoryName("");
+                    else setNewCategoryName("");
+                  }}
+                  className="rounded border-gray-300"
+                />
+                Add new category
+              </label>
+              {useNewCategory ? (
+                <>
+                  <Input
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="e.g. Sports, Beauty, Books…"
+                    className="mt-2"
+                    required
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Appears in the shop filters like built-in categories after you save.
+                  </p>
+                </>
+              ) : (
+                <select
+                  value={form.category}
+                  onChange={(e) => {
+                    const cat = e.target.value;
+                    setForm((f) => ({
+                      ...f,
+                      category: cat,
+                      size: cat === "Fashion" ? f.size : "",
+                    }));
+                  }}
+                  required
+                  className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="">Select category</option>
+                  {mergedCategoryOptions.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
             <div>
               <Label>Brand</Label>
@@ -346,6 +454,25 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
               />
               <p className="mt-1 text-xs text-gray-500">Optional</p>
             </div>
+            {(useNewCategory
+              ? newCategoryName.trim() === "Fashion"
+              : form.category === "Fashion") && (
+              <div>
+                <Label>Size</Label>
+                <select
+                  value={form.size}
+                  onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}
+                  className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="">Select size (optional)</option>
+                  {FASHION_SIZES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <Label>Images {!isAdd && "(optional, add new)"}</Label>
               <input
@@ -401,7 +528,7 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
               <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1 bg-[#FF3F6C] hover:bg-[#e0355f]" disabled={loading}>
+              <Button type="submit" className="flex-1 bg-[#FC8019] hover:bg-[#ea7310]" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : isAdd ? "Add" : "Update"}
               </Button>
             </div>

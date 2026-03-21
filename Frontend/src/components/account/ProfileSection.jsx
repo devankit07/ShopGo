@@ -189,7 +189,7 @@ export default function ProfileSection({ userId }) {
     return (
       <Card className="border-none shadow-xl bg-white/90 backdrop-blur-sm">
         <CardContent className="pt-8 flex justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-[#FF3F6C]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#FC8019]" />
         </CardContent>
       </Card>
     );
@@ -208,7 +208,7 @@ export default function ProfileSection({ userId }) {
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
               updateUser.role === "admin"
-                ? "bg-[#FF3F6C]/15 text-[#FF3F6C]"
+                ? "bg-[#FC8019]/15 text-[#FC8019]"
                 : "bg-teal-500/15 text-teal-700"
             }`}
           >
@@ -225,7 +225,7 @@ export default function ProfileSection({ userId }) {
                 alt="profile"
                 className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg ring-1 ring-gray-200"
               />
-              <label className="absolute bottom-2 right-2 p-2 bg-[#FF3F6C] text-white rounded-full cursor-pointer">
+              <label className="absolute bottom-2 right-2 p-2 bg-[#FC8019] text-white rounded-full cursor-pointer">
                 <Camera size={18} />
                 <Input
                   type="file"
@@ -248,7 +248,7 @@ export default function ProfileSection({ userId }) {
                   name="firstName"
                   value={updateUser.firstName}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                  className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
@@ -258,7 +258,7 @@ export default function ProfileSection({ userId }) {
                   name="lastName"
                   value={updateUser.lastName}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                  className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
@@ -287,7 +287,7 @@ export default function ProfileSection({ userId }) {
                 name="phoneNo"
                 value={updateUser.phoneNo}
                 onChange={handleChange}
-                className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
@@ -297,7 +297,7 @@ export default function ProfileSection({ userId }) {
                 name="address"
                 value={updateUser.address}
                 onChange={handleChange}
-                className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -308,7 +308,7 @@ export default function ProfileSection({ userId }) {
                   name="city"
                   value={updateUser.city}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                  className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
               <div className="space-y-2">
@@ -318,14 +318,14 @@ export default function ProfileSection({ userId }) {
                   name="ZipCode"
                   value={updateUser.ZipCode}
                   onChange={handleChange}
-                  className="focus-visible:ring-[#FF3F6C] text-gray-900 placeholder:text-gray-500"
+                  className="focus-visible:ring-[#FC8019] text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
             <Button
               disabled={loading}
               type="submit"
-              className="w-full bg-[#FF3F6C] hover:bg-[#e0355f] text-white font-bold h-11"
+              className="w-full bg-[#FC8019] hover:bg-[#ea7310] text-white font-bold h-11"
             >
               {loading ? (
                 <>

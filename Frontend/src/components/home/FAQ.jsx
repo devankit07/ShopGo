@@ -25,25 +25,25 @@ const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="py-16 md:py-20 bg-[#262a30] border-y border-white/5">
+    <section className="py-16 md:py-20 bg-white border-y border-[#e9e9eb]">
       <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-10">
-          Frequently Asked <span className="text-teal-400">Questions</span>
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-[#282C3F] mb-10">
+          Frequently Asked <span className="text-[#fc8019]">Questions</span>
         </h2>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, index) => (
             <div
               key={index}
-              className="rounded-xl bg-[#2d3136] border border-white/10 overflow-hidden transition-all duration-300 hover:border-teal-500/30"
+              className="rounded-xl bg-[#f8f8f8] border border-[#e9e9eb] overflow-hidden transition-all duration-300 hover:border-[#fc8019]/35"
             >
               <button
                 type="button"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left text-white font-medium"
+                className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left text-[#282C3F] font-medium"
               >
                 <span className="text-sm md:text-base">{item.question}</span>
                 <ChevronDown
-                  className={`w-5 h-5 shrink-0 text-teal-400 transition-transform duration-200 ${
+                  className={`w-5 h-5 shrink-0 text-[#fc8019] transition-transform duration-200 ${
                     openIndex === index ? "rotate-180" : ""
                   }`}
                 />
@@ -54,7 +54,7 @@ const FAQ = () => {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="px-5 pb-4 pt-0 text-sm text-gray-400 leading-relaxed border-t border-white/5">
+                  <p className="px-5 pb-4 pt-0 text-sm text-[#7E808C] leading-relaxed border-t border-[#e9e9eb]">
                     {item.answer}
                   </p>
                 </div>

@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 
 const Home = () => {
   return (
-    <div className="dark min-h-screen bg-[#262a30]">
+    <div className="min-h-screen bg-white">
       <Hero />
       <DealsBanner />
       <WhyShopGo />

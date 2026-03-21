@@ -47,37 +47,37 @@ export default function Feedback() {
   };
 
   return (
-    <main className="dark min-h-screen bg-[#262a30] pt-24 pb-16">
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-teal-500/20 border border-teal-500/50 flex items-center justify-center text-teal-400">
-            <MessageSquare className="w-6 h-6" />
+    <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
+      <div className="mx-auto max-w-2xl px-6">
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#fc8019]/35 bg-[#fff5f0] text-[#fc8019]">
+            <MessageSquare className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Customer Feedback</h1>
-            <p className="text-sm text-gray-400">View all submitted feedback</p>
+            <h1 className="text-2xl font-bold text-[#282C3F]">Customer Feedback</h1>
+            <p className="text-sm text-[#7E808C]">View all submitted feedback</p>
           </div>
         </div>
 
         {(user || token) && (
           <section>
-            <h2 className="text-lg font-bold text-white mb-4">All Feedback</h2>
+            <h2 className="mb-4 text-lg font-bold text-[#282C3F]">All Feedback</h2>
             {loadingList ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-teal-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#fc8019]" />
               </div>
             ) : list.length === 0 ? (
-              <p className="text-gray-400 text-sm py-6">No feedback yet.</p>
+              <p className="py-6 text-sm text-[#7E808C]">No feedback yet.</p>
             ) : (
               <ul className="space-y-4">
                 {list.map((item) => (
                   <li
                     key={item._id}
-                    className="rounded-xl bg-[#2d3136] border border-white/10 p-4"
+                    className="rounded-xl border border-[#e9e9eb] bg-white p-4 shadow-sm"
                   >
-                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <div className="flex gap-2 items-center flex-wrap">
-                        <span className="text-white font-medium">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-[#282C3F]">
                           {item.name ||
                             (item.userId
                               ? [item.userId.firstName, item.userId.lastName].filter(Boolean).join(" ")
@@ -89,24 +89,24 @@ export default function Feedback() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-4 h-4 ${
+                                className={`h-4 w-4 ${
                                   i < item.rating
-                                    ? "fill-teal-400 text-teal-400"
-                                    : "text-gray-600"
+                                    ? "fill-[#fc8019] text-[#fc8019]"
+                                    : "text-[#e9e9eb]"
                                 }`}
                               />
                             ))}
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500 shrink-0">
+                      <span className="shrink-0 text-xs text-[#7E808C]">
                         {formatDate(item.createdAt)}
                       </span>
                     </div>
                     {item.email && (
-                      <p className="text-xs text-gray-500 mt-1">{item.email}</p>
+                      <p className="mt-1 text-xs text-[#7E808C]">{item.email}</p>
                     )}
-                    <p className="text-gray-300 text-sm mt-2">{item.message}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#3d4152]">{item.message}</p>
                   </li>
                 ))}
               </ul>
@@ -115,8 +115,8 @@ export default function Feedback() {
         )}
 
         {!user && !token && (
-          <p className="text-center text-sm text-gray-500 py-8">
-            <Link to="/login" className="text-teal-400 hover:underline">
+          <p className="py-8 text-center text-sm text-[#7E808C]">
+            <Link to="/login" className="font-semibold text-[#fc8019] hover:underline">
               Log in
             </Link>{" "}
             to view all submitted feedback.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -8,23 +8,179 @@ import {
   removeFromCart,
 } from "@/redux/cartSlice";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Trash2, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
+import { DualCartProvider } from "@/components/cart/DualCartProvider";
+import { useDualCart } from "@/components/cart/useDualCart";
+import CartToggle from "@/components/cart/CartToggle";
+import CartItems from "@/components/cart/CartItems";
+import CouponSection from "@/components/cart/CouponSection";
+import UnlockProgressBar from "@/components/cart/UnlockProgressBar";
+import PriceSummary from "@/components/cart/PriceSummary";
+import { getRemainingAmount } from "@/components/cart/cartDiscount";
+import { markFirstOrderCompleted } from "@/components/cart/firstOrderStorage";
 
 const API_BASE = "/api/v1";
 
+const scriptFont = { fontFamily: "'Caveat', cursive" };
+
+/** Line-art mascot peeking over a shelf (empty-state illustration). */
+function EmptyCartMascot() {
+  return (
+    <svg
+      className="mx-auto h-[130px] w-[220px] shrink-0 text-[#d1d5db]"
+      viewBox="0 0 220 110"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <line
+        x1="24"
+        y1="90"
+        x2="196"
+        y2="90"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M110 90c-44 0-58-38-58-62 0-28 24-50 58-50s58 22 58 50c0 24-14 62-58 62z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M64 26 L56 4 L78 22"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M156 26 L164 4 L142 22"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="74"
+        y="42"
+        width="32"
+        height="20"
+        rx="4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="114"
+        y="42"
+        width="32"
+        height="20"
+        rx="4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M106 52h8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CartCheckoutBody({
+  items,
+  subtotal,
+  placing,
+  placeOrder,
+  onDecrease,
+  onIncrease,
+  onRemove,
+}) {
+  const { cartMode, appliedCoupon, discountUnlocked, refreshFirstOrder } =
+    useDualCart();
+  const discount = discountUnlocked ? appliedCoupon.discount : 0;
+  const finalTotal = Math.max(0, subtotal - discount);
+  const showUnlockBar =
+    subtotal > 0 && getRemainingAmount(subtotal, cartMode) > 0;
+
+  return (
+    <>
+      <UnlockProgressBar cartSubtotal={subtotal} />
+      <main
+        className={`min-h-screen bg-[#f8f8f8] pt-24 ${
+          showUnlockBar ? "pb-36 max-md:pb-40" : "pb-16"
+        } md:pb-16`}
+      >
+        <div className="mx-auto max-w-4xl px-4">
+          <h1 className="mb-2 text-2xl font-bold text-[#282C3F]">Cart</h1>
+          <p className="mb-6 text-sm text-muted-foreground">
+            Choose Cart or MaxSaver — discounts never stack.
+          </p>
+
+          <CartToggle cartSubtotal={subtotal} />
+
+          <CartItems
+            items={items}
+            onDecrease={onDecrease}
+            onIncrease={onIncrease}
+            onRemove={onRemove}
+          />
+
+          <CouponSection cartSubtotal={subtotal} />
+          <PriceSummary subtotal={subtotal} finalTotal={finalTotal} />
+
+          <div className="mt-8 flex flex-col items-stretch gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button asChild variant="outline" className="w-full sm:w-auto">
+                <Link to="/products">Continue shopping</Link>
+              </Button>
+              <Button
+                className="w-full bg-[#FC8019] hover:bg-[#ea7310] sm:w-auto"
+                onClick={() => placeOrder(finalTotal, refreshFirstOrder)}
+                disabled={placing}
+              >
+                {placing ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Place order · ₹{finalTotal.toLocaleString()}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
 export default function Cart() {
   const items = useSelector(selectCartItems);
+  const { user } = useSelector((state) => state.User);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const placeOrder = async () => {
-    const token = localStorage.getItem("accesstoken");
-    if (!token) {
+  const subtotal = useMemo(
+    () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    [items]
+  );
+
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("accesstoken")
+      : null;
+  const isLoggedIn = Boolean(token);
+  const userId = user?._id;
+
+  const placeOrder = async (finalTotal, refreshFirstOrder) => {
+    const authToken = localStorage.getItem("accesstoken");
+    if (!authToken) {
       toast.error("Please login to place order");
       navigate("/login");
       return;
@@ -41,13 +197,18 @@ export default function Cart() {
       }));
       const res = await axios.post(
         `${API_BASE}/orders`,
-        { products, totalAmount: total },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { products, totalAmount: finalTotal },
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
       if (res.data.success) {
         items.forEach((i) => dispatch(removeFromCart(i.productId)));
+        const uid =
+          res.data.order?.userId?._id ??
+          res.data.order?.userId ??
+          user?._id;
+        if (uid) markFirstOrderCompleted(String(uid));
+        refreshFirstOrder?.();
         toast.success("Order placed successfully");
-        const uid = res.data.order?.userId?._id ?? res.data.order?.userId;
         if (uid) navigate("/profile/" + uid);
         else navigate("/products");
       }
@@ -60,99 +221,55 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <main className="dark min-h-screen bg-[#262a30] pt-24 pb-16">
-        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold text-white">Your cart is empty</h1>
-          <p className="mt-2 text-gray-400">
-            Add items from the Products page.
+      <main className="min-h-screen bg-white pt-24 pb-16">
+        <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-lg flex-col items-center justify-center px-6 py-12 text-center">
+          <p
+            className="text-2xl leading-snug text-[#FC8019] sm:text-[1.65rem]"
+            style={scriptFont}
+          >
+            Your picks from ShopGo will be listed here.
           </p>
-          <Button asChild className="mt-6 bg-[#FF3F6C] hover:bg-[#e0355f]">
-            <Link to="/products">Browse products</Link>
-          </Button>
+          <div className="my-8">
+            <EmptyCartMascot />
+          </div>
+          <p
+            className="text-2xl leading-snug text-[#FC8019] sm:text-[1.65rem]"
+            style={scriptFont}
+          >
+            Go ahead and find some awesome products near you…
+          </p>
+          <h1 className="mt-10 text-2xl font-bold tracking-tight text-[#282C3F] sm:text-3xl">
+            Empty cart
+          </h1>
+          <p className="mt-2 text-base text-[#7E808C]">
+            You haven&apos;t added anything to your cart yet.
+          </p>
+          <Link
+            to="/products"
+            className="mt-8 text-sm font-semibold text-[#FC8019] underline-offset-4 hover:underline"
+          >
+            Browse products
+          </Link>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="dark min-h-screen bg-[#262a30] pt-24 pb-16">
-      <div className="mx-auto max-w-4xl px-4">
-        <h1 className="mb-8 text-2xl font-bold text-white">Cart</h1>
-        <ul className="space-y-4">
-          {items.map((item) => (
-            <li
-              key={item.productId}
-              className={cn(
-                "flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm",
-                "sm:flex-row sm:items-center"
-              )}
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="h-24 w-24 shrink-0 rounded-lg object-cover sm:h-20 sm:w-20"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-foreground">{item.name}</p>
-                <p className="text-[#FF3F6C] font-bold">
-                  ₹{Number(item.price).toLocaleString()} × {item.quantity}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-8 rounded-lg"
-                  onClick={() => dispatch(decreaseQuantity(item.productId))}
-                  disabled={item.quantity <= 1}
-                  aria-label="Decrease"
-                >
-                  <Minus className="size-4" />
-                </Button>
-                <span className="min-w-[2rem] text-center font-medium">
-                  {item.quantity}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-8 rounded-lg"
-                  onClick={() => dispatch(increaseQuantity(item.productId))}
-                  aria-label="Increase"
-                >
-                  <Plus className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-destructive hover:bg-destructive/10"
-                  onClick={() => dispatch(removeFromCart(item.productId))}
-                  aria-label="Remove"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-8 flex flex-col items-end gap-4 border-t border-border pt-6">
-          <p className="text-xl font-bold text-foreground">
-            Total: ₹{total.toLocaleString()}
-          </p>
-          <div className="flex gap-3">
-            <Button asChild variant="outline">
-              <Link to="/products">Continue shopping</Link>
-            </Button>
-            <Button
-              className="bg-[#FF3F6C] hover:bg-[#e0355f]"
-              onClick={placeOrder}
-              disabled={placing}
-            >
-              {placing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Place Order
-            </Button>
-          </div>
-        </div>
-      </div>
-    </main>
+    <DualCartProvider
+      cartSubtotal={subtotal}
+      userId={userId}
+      isLoggedIn={isLoggedIn}
+    >
+      <CartCheckoutBody
+        items={items}
+        subtotal={subtotal}
+        placing={placing}
+        placeOrder={placeOrder}
+        onDecrease={(id) => dispatch(decreaseQuantity(id))}
+        onIncrease={(id) => dispatch(increaseQuantity(id))}
+        onRemove={(id) => dispatch(removeFromCart(id))}
+      />
+    </DualCartProvider>
   );
 }

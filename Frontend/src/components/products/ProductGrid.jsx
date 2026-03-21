@@ -9,6 +9,7 @@ export default function ProductGrid({
   emptyMessage,
   pagination,
   onPageChange,
+  onMobileOpen,
 }) {
   const { page, totalPages } = pagination || { page: 1, totalPages: 1 };
 
@@ -48,7 +49,11 @@ export default function ProductGrid({
         )}
       >
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard
+            key={product._id}
+            product={product}
+            onMobileOpen={onMobileOpen}
+          />
         ))}
       </div>
 
@@ -111,7 +116,7 @@ function PaginationBar({ page, totalPages, onPageChange }) {
             size="sm"
             className={cn(
               "min-w-[2.25rem] rounded-lg",
-              p === page && "bg-[#FF3F6C] text-white hover:bg-[#e0355f]"
+              p === page && "bg-[#FC8019] text-white hover:bg-[#ea7310]"
             )}
             onClick={() => onPageChange(p)}
             aria-current={p === page ? "page" : undefined}

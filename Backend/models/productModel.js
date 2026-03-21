@@ -24,6 +24,10 @@ const productSchema = new mongoose.Schema({
   brand:{
     type: String,
   },
+  /** Optional; used for Fashion filters (e.g. S, M, L). */
+  size: {
+    type: String,
+  },
     productImage: [{
         url:{ type: String, required: true},
         public_id:{ type: String, required: true}

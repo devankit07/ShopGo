@@ -1,5 +1,12 @@
 import express from "express";
-import { addProduct, deleteProduct, getallproduct, getProductById, updateProduct } from "../controllers/productController.js";
+import {
+  addProduct,
+  deleteProduct,
+  getallproduct,
+  getProductById,
+  getProductCategories,
+  updateProduct,
+} from "../controllers/productController.js";
 import { IsAuthenticated, isAdmin } from "../middleware/IsAuthenticated.js";
 import { mulltipleUpload } from "../middleware/multer.js";
 
@@ -8,7 +15,8 @@ const router = express.Router();
 // GET /api/products or /api/v1/product/getallproducts — supports ?page=1&limit=8&category=Electronics
 router.get("/", getallproduct);
 router.get("/getallproducts", getallproduct);
-// GET /api/products/:productId — single product (must be after /getallproducts)
+router.get("/categories", getProductCategories);
+// GET /api/products/:productId — single product (must be after static paths like /categories)
 router.get("/:productId", getProductById);
 
 // POST /api/products — admin only, image upload to Cloudinary

@@ -33,7 +33,7 @@ export default function SalesAnalytics() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-10 w-10 animate-spin text-[#FF3F6C]" />
+        <Loader2 className="h-10 w-10 animate-spin text-[#FC8019]" />
       </div>
     );
   }
@@ -94,7 +94,7 @@ export default function SalesAnalytics() {
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(v) => [`₹${Number(v).toLocaleString()}`, "Sales"]} />
-                <Bar dataKey="sales" fill="#FF3F6C" radius={[4, 4, 0, 0]} name="Sales" />
+                <Bar dataKey="sales" fill="#FC8019" radius={[4, 4, 0, 0]} name="Sales" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -130,7 +130,7 @@ export default function SalesAnalytics() {
                 <Tooltip formatter={(v) => [`₹${Number(v).toLocaleString()}`, "Value"]} />
                 <Legend />
                 <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2} name="Profit" dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="revenue" stroke="#FF3F6C" strokeWidth={2} name="Revenue" dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="revenue" stroke="#FC8019" strokeWidth={2} name="Revenue" dot={{ r: 4 }} />
                 <Line type="monotone" dataKey="loss" stroke="#ef4444" strokeWidth={2} name="Loss" dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>

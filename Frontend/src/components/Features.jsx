@@ -11,7 +11,7 @@ const Features = () => {
                {/* Feature 1 */}
                <div className='flex items-center space-x-5 group'>
                  <div className='h-14 w-14 bg-pink-50 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300'>
-                    <Truck className='h-7 w-7 text-[#FF3F6C]'/>
+                    <Truck className='h-7 w-7 text-[#FC8019]'/>
                 </div>
                 <div>
                     <h3 className='font-bold text-[#3E4152] text-lg'>Free Shipping</h3>
@@ -22,7 +22,7 @@ const Features = () => {
                {/* Feature 2 */}
                <div className='flex items-center space-x-5 group'>
                  <div className='h-14 w-14 bg-pink-50 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300'>
-                    <Shield className='h-7 w-7 text-[#FF3F6C]'/>
+                    <Shield className='h-7 w-7 text-[#FC8019]'/>
                 </div>
                 <div>
                     <h3 className='font-bold text-[#3E4152] text-lg'>Secure Payment</h3>
@@ -33,7 +33,7 @@ const Features = () => {
                {/* Feature 3 */}
                <div className='flex items-center space-x-5 group'>
                  <div className='h-14 w-14 bg-pink-50 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300'>
-                    <Headphones className='h-7 w-7 text-[#FF3F6C]'/>
+                    <Headphones className='h-7 w-7 text-[#FC8019]'/>
                 </div>
                 <div>
                     <h3 className='font-bold text-[#3E4152] text-lg'>24/7 Support</h3>

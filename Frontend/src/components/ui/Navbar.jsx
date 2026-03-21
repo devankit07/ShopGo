@@ -1,6 +1,6 @@
 import { ShoppingCart } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./button";
 import axios from "axios";
 import { toast } from "sonner";
@@ -17,13 +17,12 @@ const BRAND_LOGO = (
   />
 );
 
+const ink = "text-[#282C3F]";
+
 const Navbar = () => {
-  const { pathname } = useLocation();
-  const isHome = pathname === "/";
   const { user } = useSelector((state) => state.User);
   const cartCount = useSelector(selectCartCount);
   const [isScrolled, setIsScrolled] = useState(false);
-  const navLight = isHome;
 
   const accesstoken = localStorage.getItem("accesstoken");
   const dispatch = useDispatch();
@@ -57,94 +56,32 @@ const Navbar = () => {
       console.log(error);
     }
   };
+
+  const barClass = isScrolled
+    ? "mx-4 mt-3 mb-3 rounded-full border border-[#e9e9eb] bg-white/95 shadow-md backdrop-blur-xl"
+    : "border border-transparent bg-transparent";
+
+  const linkBase = `transition-colors relative group ${ink} hover:text-[#fc8019]`;
+  const underline = "absolute -bottom-1 left-0 h-0.5 w-0 bg-[#fc8019] transition-all group-hover:w-full";
+
   return (
     <>
-    <header className="fixed top-0 left-0 w-full z-20 transition-[background,border,box-shadow] duration-300">
-      <div
-        className={`max-w-7xl mx-auto flex justify-between items-center py-3 px-6 transition-all duration-300 ${
-          isScrolled
-            ? "mx-4 mt-3 mb-3 rounded-full backdrop-blur-xl border shadow-lg " +
-              (navLight ? "bg-black/30 border-white/20" : "bg-white/15 border-white/20 shadow-black/5")
-            : navLight
-            ? "bg-transparent border border-transparent"
-            : ""
-        }`}
-      >
-        <Link
-          to="/"
-          className="flex items-center gap-2 transition-transform hover:scale-[1.02]"
+      <header className="fixed top-0 left-0 z-20 w-full transition-[background,border,box-shadow] duration-300">
+        <div
+          className={`mx-auto flex max-w-7xl items-center justify-between px-6 py-3 transition-all duration-300 ${barClass}`}
         >
-          {BRAND_LOGO}
-        </Link>
+          <Link
+            to="/"
+            className="flex items-center gap-2 transition-transform hover:scale-[1.02]"
+          >
+            {BRAND_LOGO}
+          </Link>
 
-        <nav className="flex items-center gap-10">
-          <ul className={`hidden md:flex gap-8 items-center text-[15px] font-bold uppercase tracking-wide ${navLight ? "text-white/90" : "text-[#3E4152]"}`}>
-            <Link
-              to="/"
-              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
+          <nav className="flex items-center gap-10">
+            <ul
+              className={`hidden items-center gap-8 text-[15px] font-bold uppercase tracking-wide md:flex ${ink}`}
             >
-              <li className="leading-[1.2em]">
-                <span
-                  className="block h-[1.2em] overflow-hidden"
-                  style={{ lineHeight: "1.2em" }}
-                >
-                  <span
-                    className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
-                    style={{ width: "max-content" }}
-                  >
-                    <span className="h-[1.2em] flex items-center shrink-0">Home</span>
-                    <span className="h-[1.2em] flex items-center shrink-0">Home</span>
-                  </span>
-                </span>
-              </li>
-              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
-            </Link>
-            <Link
-              to="/products"
-              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
-            >
-              <li className="leading-[1.2em]">
-                <span
-                  className="block h-[1.2em] overflow-hidden"
-                  style={{ lineHeight: "1.2em" }}
-                >
-                  <span
-                    className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
-                    style={{ width: "max-content" }}
-                  >
-                    <span className="h-[1.2em] flex items-center shrink-0">Products</span>
-                    <span className="h-[1.2em] flex items-center shrink-0">Products</span>
-                  </span>
-                </span>
-              </li>
-              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
-            </Link>
-            <Link
-              to="/feedback"
-              className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
-            >
-              <li className="leading-[1.2em]">
-                <span
-                  className="block h-[1.2em] overflow-hidden"
-                  style={{ lineHeight: "1.2em" }}
-                >
-                  <span
-                    className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
-                    style={{ width: "max-content" }}
-                  >
-                    <span className="h-[1.2em] flex items-center shrink-0">Feedback</span>
-                    <span className="h-[1.2em] flex items-center shrink-0">Feedback</span>
-                  </span>
-                </span>
-              </li>
-              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
-            </Link>
-
-            {user?.role === "admin" && (
-              <Link
-                to="/admin"
-                className={`transition-colors relative group ${navLight ? "hover:text-teal-300" : "hover:text-[var(--brand-accent)]"}`}
-              >
+              <Link to="/" className={linkBase}>
                 <li className="leading-[1.2em]">
                   <span
                     className="block h-[1.2em] overflow-hidden"
@@ -154,62 +91,115 @@ const Navbar = () => {
                       className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
                       style={{ width: "max-content" }}
                     >
-                      <span className="h-[1.2em] flex items-center shrink-0">Dashboard</span>
-                      <span className="h-[1.2em] flex items-center shrink-0">Dashboard</span>
+                      <span className="flex h-[1.2em] shrink-0 items-center">Home</span>
+                      <span className="flex h-[1.2em] shrink-0 items-center">Home</span>
                     </span>
                   </span>
                 </li>
-                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all group-hover:w-full ${navLight ? "bg-teal-400" : "bg-[var(--brand-accent)]"}`}></span>
+                <span className={underline} />
               </Link>
-            )}
+              <Link to="/products" className={linkBase}>
+                <li className="leading-[1.2em]">
+                  <span
+                    className="block h-[1.2em] overflow-hidden"
+                    style={{ lineHeight: "1.2em" }}
+                  >
+                    <span
+                      className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
+                      style={{ width: "max-content" }}
+                    >
+                      <span className="flex h-[1.2em] shrink-0 items-center">Products</span>
+                      <span className="flex h-[1.2em] shrink-0 items-center">Products</span>
+                    </span>
+                  </span>
+                </li>
+                <span className={underline} />
+              </Link>
+              <Link to="/feedback" className={linkBase}>
+                <li className="leading-[1.2em]">
+                  <span
+                    className="block h-[1.2em] overflow-hidden"
+                    style={{ lineHeight: "1.2em" }}
+                  >
+                    <span
+                      className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
+                      style={{ width: "max-content" }}
+                    >
+                      <span className="flex h-[1.2em] shrink-0 items-center">Feedback</span>
+                      <span className="flex h-[1.2em] shrink-0 items-center">Feedback</span>
+                    </span>
+                  </span>
+                </li>
+                <span className={underline} />
+              </Link>
 
-            {user && (
+              {user?.role === "admin" && (
+                <Link to="/admin" className={linkBase}>
+                  <li className="leading-[1.2em]">
+                    <span
+                      className="block h-[1.2em] overflow-hidden"
+                      style={{ lineHeight: "1.2em" }}
+                    >
+                      <span
+                        className="flex flex-col transition-transform duration-300 ease-in-out group-hover:-translate-y-1/2"
+                        style={{ width: "max-content" }}
+                      >
+                        <span className="flex h-[1.2em] shrink-0 items-center">Dashboard</span>
+                        <span className="flex h-[1.2em] shrink-0 items-center">Dashboard</span>
+                      </span>
+                    </span>
+                  </li>
+                  <span className={underline} />
+                </Link>
+              )}
+
+              {user && (
+                <Link
+                  to={`/profile/${user._id}`}
+                  className="flex items-center gap-2 rounded-full border border-[#e9e9eb] bg-white px-4 py-1.5 shadow-sm transition-colors hover:border-[#fc8019]/30 hover:bg-[#fffaf7]"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fc8019] text-[10px] font-bold text-white">
+                    {user.firstName?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className={`text-sm font-semibold ${ink}`}>
+                    Hi, {user.firstName}
+                  </span>
+                </Link>
+              )}
+            </ul>
+
+            <div className="flex items-center gap-6 border-l border-[#e9e9eb] pl-8">
               <Link
-                to={`/profile/${user._id}`}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-full transition-colors shadow-sm ${navLight ? "bg-white/15 border border-white/20 hover:bg-white/25" : "bg-gray-50 border border-gray-200 hover:bg-gray-100"}`}
+                to="/cart"
+                className={`group relative transition-colors ${ink} hover:text-[#fc8019]`}
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white ${navLight ? "bg-teal-500" : "bg-[var(--brand-accent)]"}`}>
-                  {user.firstName?.charAt(0).toUpperCase()}
-                </div>
-                <span className={`text-sm font-semibold ${navLight ? "text-white" : "text-[#3E4152]"}`}>
-                  Hi, {user.firstName}
+                <ShoppingCart className="h-6 w-6" />
+                <span className="absolute -right-3 -top-2 rounded-full bg-[#fc8019] px-1.5 py-0.5 text-[10px] font-bold text-white shadow-md transition-transform group-hover:scale-110">
+                  {cartCount}
                 </span>
               </Link>
-            )}
-          </ul>
 
-          <div className={`flex items-center gap-6 border-l pl-8 ${navLight ? "border-white/30" : "border-gray-300"}`}>
-            <Link
-              to="/cart"
-              className={`relative group transition-colors ${navLight ? "text-white/90 hover:text-teal-300" : "text-[#3E4152] hover:text-[var(--brand-accent)]"}`}
-            >
-              <ShoppingCart className="w-6 h-6" />
-              <span className="absolute -top-2 -right-3 bg-[var(--brand-accent)] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md group-hover:scale-110 transition-transform">
-                {cartCount}
-              </span>
-            </Link>
-
-            {user ? (
-              <Button
-                onClick={logouthandler}
-                variant="ghost"
-                className={`font-bold transition-all px-4 ${navLight ? "text-white/90 hover:text-teal-300 hover:bg-white/10" : "text-[#3E4152] hover:text-[var(--brand-accent)] hover:bg-orange-50"}`}
-              >
-                Logout
-              </Button>
-            ) : (
-              <Button
-                onClick={() => navigate("/login")}
-                className={navLight ? "bg-teal-500 hover:bg-teal-600 text-white font-bold px-8 rounded-md transition-all active:scale-95" : "bg-[var(--brand-accent)] hover:opacity-90 text-white font-bold px-8 rounded-md transition-all active:scale-95"}
-              >
-                Login
-              </Button>
-            )}
-          </div>
-        </nav>
-      </div>
-    </header>
-    <MobileBottomNav />
+              {user ? (
+                <Button
+                  onClick={logouthandler}
+                  variant="ghost"
+                  className={`px-4 font-bold ${ink} hover:bg-[#fff5f0] hover:text-[#fc8019]`}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => navigate("/login")}
+                  className="rounded-md bg-[#fc8019] px-8 font-bold text-white transition-all hover:bg-[#ea7310] active:scale-95"
+                >
+                  Login
+                </Button>
+              )}
+            </div>
+          </nav>
+        </div>
+      </header>
+      <MobileBottomNav />
     </>
   );
 };

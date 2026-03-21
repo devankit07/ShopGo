@@ -23,7 +23,7 @@ const MobileBottomNav = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-20 md:hidden bg-white/60 dark:bg-[#262a30]/60 backdrop-blur-xl border-t border-white/30 dark:border-white/10"
+      className="fixed bottom-0 left-0 right-0 z-20 md:hidden border-t border-[#e9e9eb] bg-white/90 backdrop-blur-xl"
       aria-label="Mobile navigation"
     >
       <div className="flex items-stretch justify-around w-full max-w-[100vw] min-h-[64px] py-2">
@@ -37,16 +37,16 @@ const MobileBottomNav = () => {
               {/* Green dot for current section (fixed height so layout doesn't shift) */}
               <div className="flex flex-col items-center justify-end h-5 mb-0.5">
                 {isActive ? (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#fc8019]" aria-hidden />
                 ) : null}
               </div>
               <div
                 className={`flex flex-col items-center justify-center gap-0.5 ${
-                  isActive ? "text-[#2d2d2d]" : "text-gray-600"
+                  isActive ? "text-[#282C3F]" : "text-[#7E808C]"
                 }`}
               >
                 <Icon
-                  className={`w-6 h-6 shrink-0 ${isActive ? "text-[#2d2d2d]" : "text-gray-600"}`}
+                  className={`h-6 w-6 shrink-0 ${isActive ? "text-[#fc8019]" : "text-[#7E808C]"}`}
                   strokeWidth={2}
                   aria-hidden
                 />

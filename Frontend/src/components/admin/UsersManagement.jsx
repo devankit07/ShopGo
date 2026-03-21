@@ -93,7 +93,7 @@ export default function UsersManagement() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-10 w-10 animate-spin text-[#FF3F6C]" />
+        <Loader2 className="h-10 w-10 animate-spin text-[#FC8019]" />
       </div>
     );
   }
@@ -148,7 +148,7 @@ export default function UsersManagement() {
                   <td className="px-4 py-3 text-sm text-[#3E4152]">{[u.firstName, u.lastName].filter(Boolean).join(" ") || "—"}</td>
                   <td className="px-4 py-3 text-sm text-[#3E4152]">{u.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-[#FF3F6C]/20 text-[#FF3F6C]" : "bg-gray-100 text-gray-700"}`}>
+                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${u.role === "admin" ? "bg-[#FC8019]/20 text-[#FC8019]" : "bg-gray-100 text-gray-700"}`}>
                       {u.role || "user"}
                     </span>
                   </td>
@@ -162,7 +162,7 @@ export default function UsersManagement() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-[#FF3F6C] border-[#FF3F6C]/30"
+                          className="text-[#FC8019] border-[#FC8019]/30"
                           disabled={acting === u._id || u._id === currentUserId}
                           onClick={() => handleRole(u._id, "admin")}
                         >
