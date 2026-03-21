@@ -207,7 +207,6 @@ export default function MobileProductSheet({ product, onClose, filterParams }) {
         quantity: qty,
       })
     );
-    toast.success("Added to cart");
   };
 
   const selectThumb = useCallback((p) => {

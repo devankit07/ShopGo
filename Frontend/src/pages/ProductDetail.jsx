@@ -5,7 +5,6 @@ import axios from "axios";
 import { ArrowLeft, ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addToCart } from "@/redux/cartSlice";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import RelatedProductsMarquee from "@/components/products/RelatedProductsMarquee";
 import CartThresholdPromoListener from "@/components/promo/CartThresholdPromoListener";
@@ -60,7 +59,6 @@ export default function ProductDetail() {
         quantity,
       })
     );
-    toast.success("Added to cart");
   };
 
   const handleBuyNow = () => {

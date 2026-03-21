@@ -4,7 +4,6 @@ import { addToCart } from "@/redux/cartSlice";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 const PLACEHOLDER_IMG = "https://placehold.co/400x300?text=Product";
 
@@ -36,7 +35,6 @@ export default function AddToCartModal({ open, onClose, product }) {
         quantity,
       })
     );
-    toast.success("Added to cart");
     handleClose();
   };
 

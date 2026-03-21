@@ -13,7 +13,7 @@ const BRAND_LOGO = (
   <img
     src="/icon.png"
     alt="SHOP-GO"
-    className="h-9 w-auto object-contain sm:h-10 md:h-11"
+    className="h-11 w-auto object-contain sm:h-12 md:h-14 lg:h-[3.75rem]"
   />
 );
 
