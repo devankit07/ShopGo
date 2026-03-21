@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
+import CartThresholdPromoListener from "@/components/promo/CartThresholdPromoListener";
 import ProductGrid from "@/components/products/ProductGrid";
 import ProductFiltersSidebar from "@/components/products/ProductFiltersSidebar";
 import MobileProductSheet from "@/components/products/MobileProductSheet";
@@ -184,6 +185,7 @@ export default function Products() {
 
   return (
     <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
+      <CartThresholdPromoListener />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <h1 className="mb-6 text-2xl font-bold text-[#282C3F] sm:mb-8 sm:text-3xl">
           Products

@@ -13,6 +13,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { DualCartProvider } from "@/components/cart/DualCartProvider";
 import { useDualCart } from "@/components/cart/useDualCart";
+import CartSavingsIntro from "@/components/cart/CartSavingsIntro";
 import CartToggle from "@/components/cart/CartToggle";
 import CartItems from "@/components/cart/CartItems";
 import CouponSection from "@/components/cart/CouponSection";
@@ -120,10 +121,11 @@ function CartCheckoutBody({
       >
         <div className="mx-auto max-w-4xl px-4">
           <h1 className="mb-2 text-2xl font-bold text-[#282C3F]">Cart</h1>
-          <p className="mb-6 text-sm text-muted-foreground">
+          <p className="mb-4 text-sm text-muted-foreground">
             Choose Cart or MaxSaver — discounts never stack.
           </p>
 
+          <CartSavingsIntro />
           <CartToggle cartSubtotal={subtotal} />
 
           <CartItems

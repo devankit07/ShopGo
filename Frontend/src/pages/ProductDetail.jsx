@@ -8,6 +8,7 @@ import { addToCart } from "@/redux/cartSlice";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import RelatedProductsMarquee from "@/components/products/RelatedProductsMarquee";
+import CartThresholdPromoListener from "@/components/promo/CartThresholdPromoListener";
 
 const API_BASE = "";
 const PLACEHOLDER_IMG = "https://placehold.co/600x600?text=Product";
@@ -70,6 +71,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <main className={pageShell}>
+        <CartThresholdPromoListener />
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid min-h-[400px] grid-cols-1 gap-8 lg:grid-cols-2">
             <div className="aspect-square animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-[#e9e9eb]" />
@@ -89,6 +91,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <main className={pageShell}>
+        <CartThresholdPromoListener />
         <div className="mx-auto max-w-2xl px-4 py-16 text-center">
           <h1 className="text-2xl font-bold text-[#282C3F]">Product not found</h1>
           <p className="mt-2 text-[#7E808C]">
@@ -112,6 +115,7 @@ export default function ProductDetail() {
 
   return (
     <main className={pageShell}>
+      <CartThresholdPromoListener />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Button
           variant="ghost"
