@@ -43,20 +43,22 @@ export default function GiveFeedback() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
-      <div className="mx-auto max-w-xl px-6">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#fc8019]/35 bg-[#fff5f0] text-[#fc8019]">
-            <MessageSquare className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#282C3F]">Give Feedback</h1>
-            <p className="text-sm text-[#7E808C]">We&apos;d love to hear from you</p>
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f7f8fb_0%,#f2f4f8_100%)] pt-24 pb-16">
+      <div className="mx-auto max-w-2xl px-6">
+        <div className="mb-8 rounded-3xl border border-[#eceef4] bg-white/90 p-6 shadow-[0_20px_40px_-30px_rgba(40,44,63,0.45)] backdrop-blur sm:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#fc8019]/35 bg-[#fff5f0] text-[#fc8019]">
+              <MessageSquare className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-[#282C3F]">Give Feedback</h1>
+              <p className="text-sm text-[#7E808C]">Clean form, quick response, better experience</p>
+            </div>
           </div>
         </div>
 
         {submitted ? (
-          <div className="rounded-2xl border border-[#e9e9eb] bg-white p-8 text-center shadow-sm">
+          <div className="rounded-3xl border border-[#eceef4] bg-white p-8 text-center shadow-[0_18px_36px_-28px_rgba(40,44,63,0.5)]">
             <p className="font-medium text-[#282C3F]">Thanks for your feedback!</p>
             <p className="mt-2 text-sm text-[#7E808C]">
               Your response helps us improve SHOP-GO.
@@ -80,7 +82,7 @@ export default function GiveFeedback() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-2xl border border-[#e9e9eb] bg-white p-6 shadow-sm md:p-8"
+            className="space-y-6 rounded-3xl border border-[#eceef4] bg-white p-6 shadow-[0_18px_38px_-28px_rgba(40,44,63,0.5)] md:p-8"
           >
             <div>
               <label className="mb-2 block text-sm font-medium text-[#282C3F]">
@@ -108,13 +110,13 @@ export default function GiveFeedback() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-[#282C3F]">Rating</label>
-              <div className="flex gap-2">
+              <div className="flex w-fit gap-2 rounded-xl border border-[#f2e4d8] bg-[#fff9f5] p-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, rating: star }))}
-                    className="rounded-lg p-1 transition-colors hover:bg-[#fff5f0]"
+                    className="rounded-lg p-1 transition-colors hover:bg-white"
                     aria-label={`${star} star`}
                   >
                     <Star
@@ -146,7 +148,7 @@ export default function GiveFeedback() {
             <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <Button
                 type="submit"
-                className="h-11 flex-1 rounded-xl bg-[#fc8019] font-semibold text-white hover:bg-[#ea7310]"
+                className="h-11 flex-1 rounded-xl bg-[#fc8019] font-semibold text-white shadow-[0_14px_24px_-14px_rgba(252,128,25,0.85)] hover:bg-[#ea7310]"
               >
                 Submit Feedback
               </Button>

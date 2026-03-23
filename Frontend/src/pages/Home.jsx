@@ -1,10 +1,11 @@
 import Hero from "@/components/Hero";
 import GuestHomeThresholdBanner from "@/components/promo/GuestHomeThresholdBanner";
 import DealsBanner from "@/components/home/DealsBanner";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import WhyShopGo from "@/components/home/WhyShopGo";
-import FeaturedServices from "@/components/home/FeaturedServices";
 import TrustStats from "@/components/home/TrustStats";
 import FAQ from "@/components/home/FAQ";
+import PremiumCTA from "@/components/home/PremiumCTA";
 import Footer from "@/components/Footer";
 
 const Home = () => {
@@ -13,10 +14,11 @@ const Home = () => {
       <GuestHomeThresholdBanner />
       <Hero />
       <DealsBanner />
+      <FeaturedProducts />
       <WhyShopGo />
-      <FeaturedServices />
       <TrustStats />
       <FAQ />
+      <PremiumCTA />
       <Footer />
     </div>
   );

@@ -58,7 +58,7 @@ function AnimatedStat({ value, suffix, label }) {
 
 const TrustStats = () => {
   return (
-    <section className="py-16 md:py-20 bg-[#f8f8f8] border-y border-[#e9e9eb]">
+    <section className="bg-[#f7f8fb] py-14 md:py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {STATS.map((stat) => (

@@ -58,7 +58,7 @@ const Navbar = () => {
   };
 
   const barClass = isScrolled
-    ? "mx-4 mt-3 mb-3 rounded-full border border-[#e9e9eb] bg-white/95 shadow-md backdrop-blur-xl"
+    ? "mx-4 mt-3 mb-3 rounded-full backdrop-blur-xl border-transparent shadow-md "
     : "border border-transparent bg-transparent";
 
   const linkBase = `transition-colors relative group ${ink} hover:text-[#fc8019]`;

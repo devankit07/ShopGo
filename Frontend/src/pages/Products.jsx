@@ -5,6 +5,8 @@ import ProductGrid from "@/components/products/ProductGrid";
 import ProductFiltersSidebar from "@/components/products/ProductFiltersSidebar";
 import MobileProductSheet from "@/components/products/MobileProductSheet";
 import { mergeCategoryConfigForStorefront } from "@/components/products/productCategories";
+import FeaturedServices from "@/components/home/FeaturedServices";
+import Footer from "@/components/Footer";
 
 const API_BASE = "";
 const PER_PAGE_MOBILE = 6;
@@ -184,64 +186,68 @@ export default function Products() {
   }, [debouncedSearch, brand, minPrice, maxPrice, size, category]);
 
   return (
-    <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
-      <CartThresholdPromoListener />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold text-[#282C3F] sm:mb-8 sm:text-3xl">
-          Products
-        </h1>
+    <>
+      <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
+        <CartThresholdPromoListener />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <h1 className="mb-6 text-2xl font-bold text-[#282C3F] sm:mb-8 sm:text-3xl">
+            Products
+          </h1>
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
-          <aside className="shrink-0 lg:sticky lg:top-24 lg:w-72 lg:self-start xl:w-80">
-            <h2 className="mb-3 hidden text-lg font-bold text-[#282C3F] lg:block">
-              Filters
-            </h2>
-            <ProductFiltersSidebar
-              isDesktopOpen={isLaptop}
-              category={category}
-              onCategoryChange={handleCategoryChange}
-              search={search}
-              onSearchChange={setSearch}
-              sort={sort}
-              onSortChange={setSort}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              onMinPriceChange={setMinPrice}
-              onMaxPriceChange={setMaxPrice}
-              brand={brand}
-              onBrandChange={setBrand}
-              size={size}
-              onSizeChange={setSize}
-              onClearFilters={clearFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
-          </aside>
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
+            <aside className="shrink-0 lg:sticky lg:top-24 lg:w-72 lg:self-start xl:w-80">
+              <h2 className="mb-3 hidden text-lg font-bold text-[#282C3F] lg:block">
+                Filters
+              </h2>
+              <ProductFiltersSidebar
+                isDesktopOpen={isLaptop}
+                category={category}
+                onCategoryChange={handleCategoryChange}
+                search={search}
+                onSearchChange={setSearch}
+                sort={sort}
+                onSortChange={setSort}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                onMinPriceChange={setMinPrice}
+                onMaxPriceChange={setMaxPrice}
+                brand={brand}
+                onBrandChange={setBrand}
+                size={size}
+                onSizeChange={setSize}
+                onClearFilters={clearFilters}
+                hasActiveFilters={hasActiveFilters}
+              />
+            </aside>
 
-          <div className="min-w-0 flex-1">
-            <p className="mb-4 text-sm text-[#7E808C]">
-              {loading ? "Loading…" : `${pagination.total} product${pagination.total === 1 ? "" : "s"} found`}
-            </p>
-            <ProductGrid
-              products={products}
-              loading={loading}
-              emptyMessage={emptyMessage}
-              pagination={pagination}
-              onPageChange={handlePageChange}
-              onMobileOpen={
-                isLaptop ? undefined : (p) => setMobileSheetProduct(p)
-              }
-            />
+            <div className="min-w-0 flex-1">
+              <p className="mb-4 text-sm text-[#7E808C]">
+                {loading ? "Loading…" : `${pagination.total} product${pagination.total === 1 ? "" : "s"} found`}
+              </p>
+              <ProductGrid
+                products={products}
+                loading={loading}
+                emptyMessage={emptyMessage}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onMobileOpen={
+                  isLaptop ? undefined : (p) => setMobileSheetProduct(p)
+                }
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {mobileSheetProduct && !isLaptop ? (
-        <MobileProductSheet
-          product={mobileSheetProduct}
-          onClose={() => setMobileSheetProduct(null)}
-          filterParams={mobileFilterParams}
-        />
-      ) : null}
-    </main>
+        {mobileSheetProduct && !isLaptop ? (
+          <MobileProductSheet
+            product={mobileSheetProduct}
+            onClose={() => setMobileSheetProduct(null)}
+            filterParams={mobileFilterParams}
+          />
+        ) : null}
+      </main>
+      <FeaturedServices />
+      <Footer />
+    </>
   );
 }
