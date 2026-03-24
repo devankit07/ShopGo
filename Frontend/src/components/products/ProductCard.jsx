@@ -83,11 +83,11 @@ export default function ProductCard({ product, onMobileOpen }) {
       <div className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_top_right,rgba(252,128,25,0.25),transparent_58%)]" />
       </div>
-      <div className="relative aspect-[13/7] overflow-hidden rounded-b-[1.1rem] bg-[#f7f7f8] sm:aspect-[16/10]">
+      <div className="relative aspect-square overflow-hidden rounded-b-[1.1rem] bg-[#f7f7f8]">
         <img
           src={imageUrl}
           alt={name}
-          className="h-full w-full object-contain object-center transition-transform duration-500 ease-out"
+          className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.03]"
         />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_42%,rgba(255,255,255,0.36)_55%,transparent_68%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="absolute inset-x-3 bottom-3 z-20 flex translate-y-2 items-center justify-end gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">

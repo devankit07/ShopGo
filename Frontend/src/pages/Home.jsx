@@ -18,6 +18,7 @@ const Home = () => {
       <WhyShopGo />
       <TrustStats />
       <FAQ />
+      <DealsBanner bannerText="SHOP NOW" />
       <PremiumCTA />
       <Footer />
     </div>

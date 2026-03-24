@@ -18,6 +18,9 @@ import OrdersManagement from "./components/admin/OrdersManagement";
 import AdminLogs from "./pages/AdminLogs";
 import Feedback from "./pages/Feedback";
 import GiveFeedback from "./pages/GiveFeedback";
+import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
 import NotFound from "./pages/NotFound";
 import AdminRoute from "./components/AdminRoute";
 
@@ -111,6 +114,39 @@ const router = createBrowserRouter([
         <Navbar />
         <main className="pb-20 md:pb-0">
           <GiveFeedback />
+        </main>
+      </>
+    ),
+  },
+  {
+    path: "/checkout",
+    element: (
+      <>
+        <Navbar />
+        <main className="pb-20 md:pb-0">
+          <Checkout />
+        </main>
+      </>
+    ),
+  },
+  {
+    path: "/success",
+    element: (
+      <>
+        <Navbar />
+        <main className="pb-20 md:pb-0">
+          <PaymentSuccess />
+        </main>
+      </>
+    ),
+  },
+  {
+    path: "/failed",
+    element: (
+      <>
+        <Navbar />
+        <main className="pb-20 md:pb-0">
+          <PaymentFailed />
         </main>
       </>
     ),

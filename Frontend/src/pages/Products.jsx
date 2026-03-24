@@ -6,6 +6,7 @@ import ProductFiltersSidebar from "@/components/products/ProductFiltersSidebar";
 import MobileProductSheet from "@/components/products/MobileProductSheet";
 import { mergeCategoryConfigForStorefront } from "@/components/products/productCategories";
 import FeaturedServices from "@/components/home/FeaturedServices";
+import DealsBanner from "@/components/home/DealsBanner";
 import Footer from "@/components/Footer";
 
 const API_BASE = "";
@@ -247,6 +248,7 @@ export default function Products() {
         ) : null}
       </main>
       <FeaturedServices />
+      <DealsBanner bannerText="SHOP NOW" />
       <Footer />
     </>
   );

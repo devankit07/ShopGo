@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 
-const BANNER_TEXT = "SHOP WITH US";
-
-const DealsBanner = () => {
+const DealsBanner = ({ bannerText = "SHOP WITH US" }) => {
   const [isPaused, setIsPaused] = useState(false);
   const repeatCount = 24;
-  const items = Array(repeatCount).fill(BANNER_TEXT);
+  const items = Array(repeatCount).fill(bannerText);
 
   return (
     <section

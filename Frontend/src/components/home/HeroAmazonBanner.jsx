@@ -69,7 +69,7 @@ export default function HeroAmazonBanner() {
       onMouseLeave={() => setPaused(false)}
     >
       <div
-        className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0e1220] shadow-[0_35px_100px_-40px_rgba(0,0,0,0.85)]"
+        className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0e1220] shadow-[0_35px_100px_-40px_rgba(0,0,0,0.95)]"
         role="region"
         aria-roledescription="carousel"
         aria-label="Featured products"
