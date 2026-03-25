@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   selectCartItems,
   increaseQuantity,
@@ -8,9 +8,6 @@ import {
   removeFromCart,
 } from "@/redux/cartSlice";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import axios from "axios";
-import { toast } from "sonner";
 import { DualCartProvider } from "@/components/cart/DualCartProvider";
 import { useDualCart } from "@/components/cart/useDualCart";
 import CartSavingsIntro from "@/components/cart/CartSavingsIntro";
@@ -20,10 +17,6 @@ import CouponSection from "@/components/cart/CouponSection";
 import UnlockProgressBar from "@/components/cart/UnlockProgressBar";
 import PriceSummary from "@/components/cart/PriceSummary";
 import { getRemainingAmount } from "@/components/cart/cartDiscount";
-import { markFirstOrderCompleted } from "@/components/cart/firstOrderStorage";
-
-const API_BASE = "/api/v1";
-
 const scriptFont = { fontFamily: "'Caveat', cursive" };
 
 /** Line-art mascot peeking over a shelf (empty-state illustration). */
@@ -98,14 +91,11 @@ function EmptyCartMascot() {
 function CartCheckoutBody({
   items,
   subtotal,
-  placing,
-  placeOrder,
   onDecrease,
   onIncrease,
   onRemove,
 }) {
-  const { cartMode, appliedCoupon, discountUnlocked, refreshFirstOrder } =
-    useDualCart();
+  const { cartMode, appliedCoupon, discountUnlocked } = useDualCart();
   const discount = discountUnlocked ? appliedCoupon.discount : 0;
   const finalTotal = Math.max(0, subtotal - discount);
   const showUnlockBar =
@@ -143,15 +133,10 @@ function CartCheckoutBody({
               <Button asChild variant="outline" className="w-full sm:w-auto">
                 <Link to="/products">Continue shopping</Link>
               </Button>
-              <Button
-                className="w-full bg-[#FC8019] hover:bg-[#ea7310] sm:w-auto"
-                onClick={() => placeOrder(finalTotal, refreshFirstOrder)}
-                disabled={placing}
-              >
-                {placing ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Place order · ₹{finalTotal.toLocaleString()}
+              <Button asChild className="w-full bg-[#FC8019] hover:bg-[#ea7310] sm:w-auto">
+                <Link to="/checkout">
+                  Proceed to payment · ₹{finalTotal.toLocaleString()}
+                </Link>
               </Button>
             </div>
           </div>
@@ -165,8 +150,6 @@ export default function Cart() {
   const items = useSelector(selectCartItems);
   const { user } = useSelector((state) => state.User);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [placing, setPlacing] = useState(false);
 
   const subtotal = useMemo(
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
@@ -179,47 +162,6 @@ export default function Cart() {
       : null;
   const isLoggedIn = Boolean(token);
   const userId = user?._id;
-
-  const placeOrder = async (finalTotal, refreshFirstOrder) => {
-    const authToken = localStorage.getItem("accesstoken");
-    if (!authToken) {
-      toast.error("Please login to place order");
-      navigate("/login");
-      return;
-    }
-    if (items.length === 0) return;
-    setPlacing(true);
-    try {
-      const products = items.map((i) => ({
-        productId: i.productId,
-        productName: i.name,
-        productImage: i.image,
-        quantity: i.quantity,
-        price: i.price,
-      }));
-      const res = await axios.post(
-        `${API_BASE}/orders`,
-        { products, totalAmount: finalTotal },
-        { headers: { Authorization: `Bearer ${authToken}` } }
-      );
-      if (res.data.success) {
-        items.forEach((i) => dispatch(removeFromCart(i.productId)));
-        const uid =
-          res.data.order?.userId?._id ??
-          res.data.order?.userId ??
-          user?._id;
-        if (uid) markFirstOrderCompleted(String(uid));
-        refreshFirstOrder?.();
-        toast.success("Order placed successfully");
-        if (uid) navigate("/profile/" + uid);
-        else navigate("/products");
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to place order");
-    } finally {
-      setPlacing(false);
-    }
-  };
 
   if (items.length === 0) {
     return (
@@ -266,8 +208,6 @@ export default function Cart() {
       <CartCheckoutBody
         items={items}
         subtotal={subtotal}
-        placing={placing}
-        placeOrder={placeOrder}
         onDecrease={(id) => dispatch(decreaseQuantity(id))}
         onIncrease={(id) => dispatch(increaseQuantity(id))}
         onRemove={(id) => dispatch(removeFromCart(id))}

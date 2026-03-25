@@ -7,13 +7,14 @@ import orderRoute from "./routes/orderRoute.js";
 import adminRoute from "./routes/adminRoute.js";
 import feedbackRoute from "./routes/feedbackRoute.js";
 import paymentRoute from "./routes/paymentRoute.js";
+import { createRazorpayOrder } from "./controllers/paymentController.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 const app = express();
 dotenv.config({ path: ".env.local" });
 dotenv.config();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -29,7 +30,8 @@ app.use("/api/products", product); // GET /api/products, POST /api/products/add
 app.use("/api/v1/orders", orderRoute);
 app.use("/api/v1/feedback", feedbackRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/create-order", paymentRoute);
+app.use("/api/payment", paymentRoute);
+app.post("/api/create-order", createRazorpayOrder); // backward-compatible endpoint
 
 // Serve React app for non-API routes (supports refresh/deep links on Render)
 app.get(/^\/(?!api).*/, (req, res) => {

@@ -67,8 +67,8 @@ const WhyShopGo = () => {
                   scale: 1.02,
                   rotateX: 6,
                   rotateY: -5,
+                  transition: { type: "spring", stiffness: 250, damping: 18 },
                 }}
-                transition={{ type: "spring", stiffness: 250, damping: 18 }}
               >
                 <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(252,128,25,0.22),transparent_55%)]" />
