@@ -17,11 +17,13 @@ import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import { setAccessToken, setRefreshToken, setStoredUser } from "@/lib/authStorage";
+import AuthMoodPanel from "@/components/auth/AuthMoodPanel";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [activeField, setActiveField] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -48,27 +50,42 @@ const Login = () => {
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      const isNetworkIssue =
+        error?.code === "ECONNABORTED" ||
+        error?.code === "ERR_NETWORK" ||
+        String(error?.message || "").includes("Network Error");
+      toast.error(
+        error.response?.data?.message ||
+          (isNetworkIssue
+            ? "Cannot reach backend API. Start backend on port 8000."
+            : "Something went wrong")
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const filledCount = [formData.email, formData.password].filter(
+    (v) => String(v || "").trim().length > 0
+  ).length;
+  const mood = filledCount === 0 ? "empty" : filledCount < 2 ? "typing" : "done";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 transition-colors duration-300">
-      <Card className="w-full max-w-md bg-slate-900/80 border-slate-700 shadow-2xl backdrop-blur-sm transition-all duration-300">
+    <div className="min-h-screen bg-[#030508] p-4 transition-colors duration-300">
+      <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-6 py-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <Card className="w-full bg-[#0f1724]/90 border-white/15 shadow-2xl backdrop-blur-sm transition-all duration-300">
         <CardHeader className="text-center space-y-1 pb-2">
           <CardTitle className="text-2xl font-bold text-white">
             Log in to your account
           </CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-slate-300">
             Enter your email and password to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submitHandler} className="grid gap-5">
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-sm font-medium text-slate-300">
+              <Label htmlFor="email" className="text-sm font-medium text-slate-200">
                 Email
               </Label>
               <Input
@@ -79,17 +96,18 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-pink-500 h-11"
+                onFocus={() => setActiveField("email")}
+                className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11"
               />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-slate-300">
+                <Label htmlFor="password" className="text-sm font-medium text-slate-200">
                   Password
                 </Label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-pink-400 hover:text-pink-300 hover:underline transition-colors"
+                  className="text-xs text-[#ffb27a] hover:text-[#ffc79d] hover:underline transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -103,11 +121,12 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
-                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus-visible:ring-pink-500 h-11 pr-10"
+                  onFocus={() => setActiveField("password")}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11 pr-10"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-pink-400 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#fc8019] transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label="Toggle password visibility"
                 >
@@ -118,7 +137,7 @@ const Login = () => {
             <Button
               disabled={loading}
               type="submit"
-              className="w-full h-11 mt-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-lg transition-all duration-200 active:scale-[0.98]"
+              className="w-full h-11 mt-2 bg-[#fc8019] hover:bg-[#ea7310] text-white font-semibold rounded-lg transition-all duration-200 active:scale-[0.98]"
             >
               {loading ? (
                 <>
@@ -130,16 +149,26 @@ const Login = () => {
               )}
             </Button>
           </form>
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-3 w-full text-slate-300 hover:bg-white/10 hover:text-white"
+            onClick={() => navigate("/", { replace: true })}
+          >
+            Skip for now
+          </Button>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4 border-t border-slate-700 pt-6">
-          <p className="text-sm text-slate-400 text-center">
+        <CardFooter className="flex flex-col gap-4 border-t border-white/10 pt-6">
+          <p className="text-sm text-slate-300 text-center">
             Don&apos;t have an account?{" "}
-            <Link to="/signup" className="font-semibold text-pink-400 hover:underline">
+            <Link to="/signup" className="font-semibold text-[#ffb27a] hover:underline">
               Sign up
             </Link>
           </p>
         </CardFooter>
       </Card>
+      <AuthMoodPanel mode="login" mood={mood} activeField={activeField} />
+      </div>
     </div>
   );
 };

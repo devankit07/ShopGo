@@ -4,6 +4,9 @@ import { addToCart } from "@/redux/cartSlice";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { getAccessToken } from "@/lib/authStorage";
 
 const PLACEHOLDER_IMG = "https://placehold.co/400x300?text=Product";
 
@@ -11,6 +14,7 @@ export default function AddToCartModal({ open, onClose, product }) {
   const [quantity, setQuantity] = useState(1);
   const [isClosing, setIsClosing] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
@@ -26,6 +30,12 @@ export default function AddToCartModal({ open, onClose, product }) {
 
   const handleAdd = () => {
     if (!product) return;
+    if (!getAccessToken()) {
+      toast.info("Please login to add items to cart.");
+      handleClose();
+      navigate("/login", { replace: true });
+      return;
+    }
     dispatch(
       addToCart({
         productId: product._id || product.productId,

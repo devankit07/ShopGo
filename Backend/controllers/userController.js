@@ -10,7 +10,7 @@ import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     if (!firstName || !email || !password) {
       return res.status(400).json({
@@ -19,7 +19,31 @@ export const register = async (req, res) => {
       });
     }
 
-    const existing = await User.findOne({ email: email.toLowerCase().trim() });
+    const normalizedEmail = email.toLowerCase().trim();
+    const requestedRole = role === "admin" ? "admin" : "user";
+    const approvedAdminEmails = String(process.env.ADMIN_SIGNUP_EMAILS || "")
+      .split(",")
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (requestedRole === "admin") {
+      if (!approvedAdminEmails.length) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Admin signup is currently disabled. Contact system owner.",
+        });
+      }
+      if (!approvedAdminEmails.includes(normalizedEmail)) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "This email is not approved for admin signup. Use an authorized admin email.",
+        });
+      }
+    }
+
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return res.status(400).json({
         success: false,
@@ -32,8 +56,9 @@ export const register = async (req, res) => {
     const newUser = await User.create({
       firstName: firstName.trim(),
       lastName: (lastName || "").trim(),
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       password: hashedPassword,
+      role: requestedRole,
     });
 
     await Notification.create({

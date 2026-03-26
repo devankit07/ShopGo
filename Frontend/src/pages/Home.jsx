@@ -7,10 +7,12 @@ import TrustStats from "@/components/home/TrustStats";
 import FAQ from "@/components/home/FAQ";
 import PremiumCTA from "@/components/home/PremiumCTA";
 import Footer from "@/components/Footer";
+import AuthEntryGate from "@/components/auth/AuthEntryGate";
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-white">
+      <AuthEntryGate />
       <GuestHomeThresholdBanner />
       <Hero />
       <DealsBanner />
