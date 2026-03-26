@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ShieldCheck, UserPlus, LogIn, Sparkles } from "lucide-react";
+import { UserPlus, LogIn, Sparkles } from "lucide-react";
 import { getAccessToken } from "@/lib/authStorage";
 import DarkMeshBackdrop from "@/components/ui/DarkMeshBackdrop";
 
@@ -20,13 +20,11 @@ export default function AuthEntryGate() {
   const moodText =
     focusAction === "login" || focusAction === "user"
       ? "Yay! I am happy to help."
-      : focusAction === "admin"
-      ? "Admin mode looks awesome."
       : focusAction === "skip"
       ? "Okay, browse first."
       : "I feel a little sad. Pick an option.";
   const robotMood =
-    focusAction === "login" || focusAction === "user" || focusAction === "admin"
+    focusAction === "login" || focusAction === "user"
       ? "happy"
       : focusAction === "skip"
       ? "neutral"
@@ -76,15 +74,6 @@ export default function AuthEntryGate() {
               >
                 <UserPlus className="h-4 w-4" />
                 Sign up as User
-              </Link>
-              <Link
-                to="/signup?type=admin"
-                onMouseEnter={() => setFocusAction("admin")}
-                onFocus={() => setFocusAction("admin")}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#ffd7b5] bg-[#fff4ea] px-4 py-3 text-sm font-semibold text-[#7a3f12] transition-colors hover:bg-[#ffecd9]"
-              >
-                <ShieldCheck className="h-4 w-4" />
-                Admin sign up
               </Link>
               <button
                 type="button"

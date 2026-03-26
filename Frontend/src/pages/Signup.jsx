@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,25 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertTriangle, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import AuthMoodPanel from "@/components/auth/AuthMoodPanel";
-
-const parseAllowedAdminEmails = () =>
-  String(import.meta.env.VITE_ADMIN_SIGNUP_EMAILS || "")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeField, setActiveField] = useState("");
-  const [searchParams] = useSearchParams();
-  const initialType = searchParams.get("type") === "admin" ? "admin" : "user";
-  const [accountType, setAccountType] = useState(initialType);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,12 +27,6 @@ const Signup = () => {
     password: "",
   });
   const navigate = useNavigate();
-  const allowedAdminEmails = useMemo(parseAllowedAdminEmails, []);
-  const enteredEmail = formData.email.trim().toLowerCase();
-  const adminEmailAllowed =
-    accountType === "admin"
-      ? allowedAdminEmails.length > 0 && allowedAdminEmails.includes(enteredEmail)
-      : true;
   const progressFields = [
     formData.firstName,
     formData.lastName,
@@ -63,17 +48,11 @@ const Signup = () => {
     try {
       setLoading(true);
       const res = await axios.post("/api/v1/user/register", {
-        firstName:
-          accountType === "admin"
-            ? "Admin"
-            : formData.firstName.trim(),
-        lastName:
-          accountType === "admin"
-            ? ""
-            : formData.lastName.trim(),
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
-        role: accountType,
+        role: "user",
       });
       if (res.data.success) {
         toast.success(res.data.message);
@@ -101,106 +80,46 @@ const Signup = () => {
       <Card className="w-full bg-[#0f1724]/90 border-white/15 shadow-2xl backdrop-blur-sm transition-all duration-300">
         <CardHeader className="text-center space-y-1 pb-2">
           <CardTitle className="text-2xl font-bold text-white">
-            {accountType === "admin" ? "Create admin account" : "Create an account"}
+            Create an account
           </CardTitle>
           <CardDescription className="text-slate-300">
-            {accountType === "admin"
-              ? "Admin access requires an approved admin email"
-              : "Enter your details to get started with ShopGo"}
+            Enter your details to get started with ShopGo
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submitHandler} className="grid gap-5">
             <div className="grid gap-2">
-              <Label className="text-sm font-medium text-slate-300">Account type</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAccountType("user")}
-                  className={`h-10 rounded-lg border text-sm font-semibold transition-colors ${
-                    accountType === "user"
-                      ? "border-[#fc8019] bg-[#fc8019]/20 text-[#ffd7b5]"
-                      : "border-white/20 bg-white/10 text-slate-300"
-                  }`}
-                >
-                  User
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAccountType("admin")}
-                  className={`h-10 rounded-lg border text-sm font-semibold transition-colors ${
-                    accountType === "admin"
-                      ? "border-amber-400 bg-amber-500/20 text-amber-200"
-                      : "border-white/20 bg-white/10 text-slate-300"
-                  }`}
-                >
-                  Admin
-                </button>
-              </div>
+              <Label htmlFor="firstName" className="text-sm font-medium text-slate-200">
+                First name
+              </Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                placeholder="First name"
+                required
+                value={formData.firstName}
+                onChange={handleChange}
+                onFocus={() => setActiveField("firstName")}
+                className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11"
+              />
             </div>
-
-            {accountType === "admin" ? (
-              <div
-                className={`rounded-lg border px-3 py-2 text-xs ${
-                  adminEmailAllowed
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-                    : "border-amber-500/40 bg-amber-500/10 text-amber-200"
-                }`}
-              >
-                <p className="mb-1 inline-flex items-center gap-1 font-semibold">
-                  {adminEmailAllowed ? (
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                  ) : (
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                  )}
-                  Admin email validation
-                </p>
-                <p>
-                  {allowedAdminEmails.length === 0
-                    ? "Local list is not configured. Server will validate admin access."
-                    : adminEmailAllowed
-                    ? "Approved admin email detected. You can continue."
-                    : "This email may be rejected by server if not in admin allow-list."}
-                </p>
-              </div>
-            ) : null}
-
-            {accountType !== "admin" ? (
-              <>
-                <div className="grid gap-2">
-                  <Label htmlFor="firstName" className="text-sm font-medium text-slate-200">
-                    First name
-                  </Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    placeholder="First name"
-                    required
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    onFocus={() => setActiveField("firstName")}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="lastName" className="text-sm font-medium text-slate-200">
-                    Last name
-                  </Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    placeholder="Last name"
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    onFocus={() => setActiveField("lastName")}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11"
-                  />
-                </div>
-              </>
-            ) : null}
+            <div className="grid gap-2">
+              <Label htmlFor="lastName" className="text-sm font-medium text-slate-200">
+                Last name
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Last name"
+                required
+                value={formData.lastName}
+                onChange={handleChange}
+                onFocus={() => setActiveField("lastName")}
+                className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus-visible:ring-[#fc8019] h-11"
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="email" className="text-sm font-medium text-slate-200">
                 Email
@@ -254,7 +173,7 @@ const Signup = () => {
                   Creating account...
                 </>
               ) : (
-                accountType === "admin" ? "Sign up as admin" : "Sign up"
+                "Sign up"
               )}
             </Button>
           </form>
@@ -272,7 +191,7 @@ const Signup = () => {
         mode="signup"
         mood={mood}
         activeField={activeField}
-        accountType={accountType}
+        accountType="user"
       />
       </div>
     </div>
