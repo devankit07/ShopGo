@@ -11,18 +11,25 @@ import { createRazorpayOrder } from "./controllers/paymentController.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 const app = express();
 dotenv.config({ path: ".env.local" });
 dotenv.config();
 const PORT = process.env.PORT || 8000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, "public");
+const spaIndexCandidates = [
+  path.join(publicDir, "index.html"),
+  path.join(publicDir, "assets", "index.html"),
+];
+const spaIndexPath = spaIndexCandidates.find((candidate) => existsSync(candidate));
 
 //middleware
 app.use(express.json());
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(publicDir));
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", product);
@@ -35,7 +42,10 @@ app.post("/api/create-order", createRazorpayOrder); // backward-compatible endpo
 
 // Serve React app for non-API routes (supports refresh/deep links on Render)
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  if (!spaIndexPath) {
+    return res.status(404).send("Frontend build not found on server");
+  }
+  res.sendFile(spaIndexPath);
 });
 
 app.listen(PORT, () => {
