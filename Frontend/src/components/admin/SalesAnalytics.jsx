@@ -72,8 +72,8 @@ export default function SalesAnalytics() {
         </Card>
         <Card className="border-none shadow-md rounded-2xl">
           <CardContent className="p-5">
-            <p className="text-sm text-gray-500">Total Profit</p>
-            <p className="text-xl font-bold text-emerald-600">₹{(summary?.totalProfit ?? 0).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">Today Revenue</p>
+            <p className="text-xl font-bold text-emerald-600">₹{(summary?.todayRevenue ?? 0).toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card className="border-none shadow-md rounded-2xl">

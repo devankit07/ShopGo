@@ -76,8 +76,17 @@ export const getSalesAnalytics = async (req, res) => {
 
     let totalRevenue = 0;
     let totalCost = 0;
+    let todayRevenue = 0;
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
     orders.forEach((o) => {
       totalRevenue += o.totalAmount || 0;
+      if (new Date(o.createdAt) >= startOfToday) {
+        todayRevenue += o.totalAmount || 0;
+      }
       (o.products || []).forEach((p) => {
         totalCost += (p.cost !== undefined ? p.cost : 0) * (p.quantity || 1);
       });
@@ -108,7 +117,7 @@ export const getSalesAnalytics = async (req, res) => {
       monthlySales,
       monthlyOrders,
       profitLossByMonth,
-      summary: { totalRevenue, totalProfit, totalLoss },
+      summary: { totalRevenue, todayRevenue, totalProfit, totalLoss },
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

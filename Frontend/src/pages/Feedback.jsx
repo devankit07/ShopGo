@@ -4,6 +4,7 @@ import { MessageSquare, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import DarkMeshBackdrop from "@/components/ui/DarkMeshBackdrop";
 
 const API_BASE = "/api/v1";
 
@@ -47,20 +48,21 @@ export default function Feedback() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f7f8fb_0%,#f2f4f8_100%)] pt-24 pb-16">
-      <div className="mx-auto max-w-3xl px-6">
-        <div className="mb-8 rounded-3xl border border-[#eceef4] bg-white/90 p-6 shadow-[0_20px_40px_-30px_rgba(40,44,63,0.45)] backdrop-blur sm:p-8">
+    <main className="relative min-h-screen overflow-hidden bg-[#030508] pt-24 pb-16">
+      <DarkMeshBackdrop glow="top" />
+      <div className="relative z-10 mx-auto max-w-3xl px-6">
+        <div className="mb-8 rounded-3xl border border-white/15 bg-[#0f1724]/90 p-6 shadow-[0_20px_40px_-30px_rgba(0,0,0,0.75)] backdrop-blur sm:p-8">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#fc8019]/35 bg-[#fff5f0] text-[#fc8019]">
               <MessageSquare className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#282C3F]">Customer Feedback</h1>
-              <p className="text-sm text-[#7E808C]">Real voices from our shoppers</p>
+              <h1 className="text-2xl font-bold text-white">Customer Feedback</h1>
+              <p className="text-sm text-gray-300">Real voices from our shoppers</p>
             </div>
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#f2e4d8] bg-[#fff9f5] px-4 py-3">
-            <p className="text-sm font-medium text-[#3d4152]">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
+            <p className="text-sm font-medium text-white">
               {loadingList ? "Loading reviews..." : `${list.length} feedback entr${list.length === 1 ? "y" : "ies"}`}
             </p>
             <Link
@@ -74,13 +76,13 @@ export default function Feedback() {
 
         {(user || token) && (
           <section>
-            <h2 className="mb-4 text-lg font-bold text-[#282C3F]">All Feedback</h2>
+            <h2 className="mb-4 text-lg font-bold text-white">All Feedback</h2>
             {loadingList ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-[#fc8019]" />
               </div>
             ) : list.length === 0 ? (
-              <div className="rounded-2xl border border-[#eceef4] bg-white p-8 text-center text-sm text-[#7E808C]">
+              <div className="rounded-2xl border border-white/15 bg-[#0f1724]/85 p-8 text-center text-sm text-gray-200">
                 No feedback yet.
               </div>
             ) : (
@@ -88,11 +90,11 @@ export default function Feedback() {
                 {list.map((item) => (
                   <li
                     key={item._id}
-                    className="rounded-2xl border border-[#eceef4] bg-white p-5 shadow-[0_16px_36px_-30px_rgba(40,44,63,0.55)] transition-all duration-300 hover:border-[#fc8019]/30 hover:shadow-[0_20px_42px_-30px_rgba(252,128,25,0.35)]"
+                    className="rounded-2xl border border-white/15 bg-[#0f1724]/85 p-5 shadow-[0_16px_36px_-30px_rgba(0,0,0,0.75)] transition-all duration-300 hover:border-[#fc8019]/40 hover:shadow-[0_20px_42px_-30px_rgba(252,128,25,0.35)]"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-base font-semibold text-[#282C3F]">
+                        <span className="text-base font-semibold text-white">
                           {item.name ||
                             (item.userId
                               ? [item.userId.firstName, item.userId.lastName].filter(Boolean).join(" ")
@@ -114,14 +116,14 @@ export default function Feedback() {
                           </span>
                         )}
                       </div>
-                      <span className="shrink-0 text-xs text-[#7E808C]">
+                      <span className="shrink-0 text-xs text-gray-300">
                         {formatDate(item.createdAt)}
                       </span>
                     </div>
                     {item.email && (
-                      <p className="mt-1 text-xs text-[#7E808C]">{item.email}</p>
+                      <p className="mt-1 text-xs text-gray-300">{item.email}</p>
                     )}
-                    <p className="mt-3 rounded-xl bg-[#f9fafd] px-3.5 py-3 text-sm leading-relaxed text-[#3d4152]">
+                    <p className="mt-3 rounded-xl bg-white/10 px-3.5 py-3 text-sm leading-relaxed text-gray-100">
                       {item.message}
                     </p>
                   </li>
@@ -132,7 +134,7 @@ export default function Feedback() {
         )}
 
         {!user && !token && (
-          <p className="py-8 text-center text-sm text-[#7E808C]">
+          <p className="py-8 text-center text-sm text-gray-300">
             <Link to="/login" className="font-semibold text-[#fc8019] hover:underline">
               Log in
             </Link>{" "}

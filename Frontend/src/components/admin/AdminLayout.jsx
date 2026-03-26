@@ -140,15 +140,24 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen md:flex bg-gray-50">
       <aside
-        className={`bg-[#3E4152] text-white flex flex-col ${
+        className={`relative overflow-hidden bg-[#030508] text-white flex flex-col ${
           showMobileMenu ? "w-full min-h-screen" : "hidden"
         } md:flex md:w-64 md:shrink-0 md:min-h-0`}
       >
-        <div className="p-6 border-b border-white/10">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.34]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, transparent 0px, transparent 11px, rgba(255,255,255,0.07) 11px, rgba(255,255,255,0.07) 12px), repeating-linear-gradient(-45deg, transparent 0px, transparent 11px, rgba(255,255,255,0.07) 11px, rgba(255,255,255,0.07) 12px)",
+          }}
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_35%,rgba(35,52,78,0.38)_0%,#030508_72%)]" aria-hidden />
+        <div className="relative z-10 p-6 border-b border-white/10">
           <BrandLogo />
           <p className="text-xs text-white/70 mt-1">Admin Panel</p>
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="relative z-10 flex-1 p-3 space-y-1 overflow-y-auto">
           {menu.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -167,7 +176,7 @@ export default function AdminLayout() {
             );
           })}
         </nav>
-        <div className="p-3 border-t border-white/10">
+        <div className="relative z-10 p-3 border-t border-white/10">
           <Button
             variant="ghost"
             size="sm"

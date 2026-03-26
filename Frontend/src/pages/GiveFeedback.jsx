@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import DarkMeshBackdrop from "@/components/ui/DarkMeshBackdrop";
 
 const API_BASE = "/api/v1";
 
 const inputClass =
-  "w-full rounded-xl border border-[#e9e9eb] bg-white px-4 text-[#282C3F] placeholder:text-[#7E808C] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fc8019]/40";
+  "w-full rounded-xl border border-white/20 bg-white/10 px-4 text-white placeholder:text-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fc8019]/50";
 
 export default function GiveFeedback() {
   const navigate = useNavigate();
@@ -43,24 +44,25 @@ export default function GiveFeedback() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f7f8fb_0%,#f2f4f8_100%)] pt-24 pb-16">
-      <div className="mx-auto max-w-2xl px-6">
-        <div className="mb-8 rounded-3xl border border-[#eceef4] bg-white/90 p-6 shadow-[0_20px_40px_-30px_rgba(40,44,63,0.45)] backdrop-blur sm:p-8">
+    <main className="relative min-h-screen overflow-hidden bg-[#030508] pt-24 pb-16">
+      <DarkMeshBackdrop glow="top" />
+      <div className="relative z-10 mx-auto max-w-2xl px-6">
+        <div className="mb-8 rounded-3xl border border-white/15 bg-[#0f1724]/90 p-6 shadow-[0_20px_40px_-30px_rgba(0,0,0,0.75)] backdrop-blur sm:p-8">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#fc8019]/35 bg-[#fff5f0] text-[#fc8019]">
               <MessageSquare className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#282C3F]">Give Feedback</h1>
-              <p className="text-sm text-[#7E808C]">Clean form, quick response, better experience</p>
+              <h1 className="text-2xl font-bold text-white">Give Feedback</h1>
+              <p className="text-sm text-gray-300">Clean form, quick response, better experience</p>
             </div>
           </div>
         </div>
 
         {submitted ? (
-          <div className="rounded-3xl border border-[#eceef4] bg-white p-8 text-center shadow-[0_18px_36px_-28px_rgba(40,44,63,0.5)]">
-            <p className="font-medium text-[#282C3F]">Thanks for your feedback!</p>
-            <p className="mt-2 text-sm text-[#7E808C]">
+          <div className="rounded-3xl border border-white/15 bg-[#0f1724]/90 p-8 text-center shadow-[0_18px_36px_-28px_rgba(0,0,0,0.75)]">
+            <p className="font-medium text-white">Thanks for your feedback!</p>
+            <p className="mt-2 text-sm text-gray-300">
               Your response helps us improve SHOP-GO.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -82,10 +84,14 @@ export default function GiveFeedback() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-3xl border border-[#eceef4] bg-white p-6 shadow-[0_18px_38px_-28px_rgba(40,44,63,0.5)] md:p-8"
+            className="space-y-6 rounded-3xl border border-white/15 bg-[#0f1724]/90 p-6 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.75)] md:p-8"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(45deg, transparent 0px, transparent 11px, rgba(255,255,255,0.06) 11px, rgba(255,255,255,0.06) 12px), repeating-linear-gradient(-45deg, transparent 0px, transparent 11px, rgba(255,255,255,0.06) 11px, rgba(255,255,255,0.06) 12px)",
+            }}
           >
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#282C3F]">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Name (optional)
               </label>
               <input
@@ -97,7 +103,7 @@ export default function GiveFeedback() {
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#282C3F]">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Email (optional)
               </label>
               <input
@@ -109,14 +115,14 @@ export default function GiveFeedback() {
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#282C3F]">Rating</label>
-              <div className="flex w-fit gap-2 rounded-xl border border-[#f2e4d8] bg-[#fff9f5] p-2">
+              <label className="mb-2 block text-sm font-medium text-white">Rating</label>
+              <div className="flex w-fit gap-2 rounded-xl border border-white/20 bg-white/10 p-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, rating: star }))}
-                    className="rounded-lg p-1 transition-colors hover:bg-white"
+                    className="rounded-lg p-1 transition-colors hover:bg-white/15"
                     aria-label={`${star} star`}
                   >
                     <Star
@@ -131,8 +137,8 @@ export default function GiveFeedback() {
               </div>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#282C3F]">
-                Your feedback <span className="font-normal text-[#7E808C]">(required)</span>
+              <label className="mb-2 block text-sm font-medium text-white">
+                Your feedback <span className="font-normal text-gray-300">(required)</span>
               </label>
               <textarea
                 value={form.message}
@@ -156,7 +162,7 @@ export default function GiveFeedback() {
                 type="button"
                 variant="outline"
                 asChild
-                className="h-11 border-[#e9e9eb] text-[#7E808C] hover:bg-[#f8f8f8] hover:text-[#282C3F]"
+                className="h-11 border-white/25 bg-transparent text-gray-200 hover:bg-white/10 hover:text-white"
               >
                 <Link to="/">Cancel</Link>
               </Button>

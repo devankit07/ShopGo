@@ -62,8 +62,8 @@ export default function OrdersSection({ userId }) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-[#3E4152] mb-1">My Orders</h2>
-        <p className="text-gray-500 text-sm">View and track your order history.</p>
+        <h2 className="text-2xl font-bold text-white mb-1">My Orders</h2>
+        <p className="text-gray-300 text-sm">View and track your order history.</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -72,6 +72,7 @@ function CheckoutInner() {
             products,
             totalAmount: finalTotal,
             paymentMethod: "Razorpay",
+            paymentStatus: "Paid",
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -112,6 +113,7 @@ function CheckoutInner() {
           products,
           totalAmount: finalTotal,
           paymentMethod: "Cash on Delivery",
+          paymentStatus: "Pending",
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );

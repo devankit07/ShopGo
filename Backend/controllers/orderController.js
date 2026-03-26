@@ -4,7 +4,7 @@ import { Notification } from "../models/Notification.js";
 export const createOrder = async (req, res) => {
   try {
     const userId = req.id;
-    const { products, totalAmount, shippingAddress, paymentMethod } = req.body;
+    const { products, totalAmount, shippingAddress, paymentMethod, paymentStatus } = req.body;
     if (!products?.length || totalAmount == null) {
       return res.status(400).json({
         success: false,
@@ -19,12 +19,21 @@ export const createOrder = async (req, res) => {
       price: p.price || 0,
       cost: p.cost ?? 0,
     }));
+    const normalizedPaymentMethod = String(paymentMethod || "Card");
+    const normalizedPaymentStatus = (() => {
+      if (paymentStatus === "Paid") return "Paid";
+      if (paymentStatus === "Failed") return "Failed";
+      if (paymentStatus === "Refunded") return "Refunded";
+      if (paymentStatus === "Pending") return "Pending";
+      return normalizedPaymentMethod.toLowerCase().includes("cash") ? "Pending" : "Pending";
+    })();
     const order = await Order.create({
       userId,
       products: orderProducts,
       totalAmount: Number(totalAmount),
       shippingAddress: shippingAddress || {},
-      paymentMethod: paymentMethod || "Card",
+      paymentMethod: normalizedPaymentMethod,
+      paymentStatus: normalizedPaymentStatus,
     });
     await Notification.create({
       message: `New order placed for ₹${Number(totalAmount)}`,
