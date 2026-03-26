@@ -158,7 +158,7 @@ const Navbar = () => {
                   to={`/profile/${user._id}`}
                   className="flex items-center gap-2 rounded-full border border-[#e9e9eb] bg-white px-4 py-1.5 shadow-sm transition-colors hover:border-[#fc8019]/30 hover:bg-[#fffaf7]"
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fc8019] text-[10px] font-bold text-white">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fc8019] text-[10px] font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4),0_0_1px_rgba(0,0,0,0.25)]">
                     {user.firstName?.charAt(0).toUpperCase()}
                   </div>
                   <span className={`text-sm font-semibold ${ink}`}>

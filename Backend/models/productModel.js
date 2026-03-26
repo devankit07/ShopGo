@@ -24,6 +24,13 @@ const productSchema = new mongoose.Schema({
   brand:{
     type: String,
   },
+  /** Average rating 0–5 (for storefront filters). */
+  rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 4.5,
+  },
   /** Optional; used for Fashion filters (e.g. S, M, L). */
   size: {
     type: String,

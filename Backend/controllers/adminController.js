@@ -304,3 +304,20 @@ export const markNotificationRead = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const markAllNotificationsRead = async (req, res) => {
+  try {
+    const result = await Notification.updateMany(
+      { isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "All notifications marked as read",
+      modifiedCount: result.modifiedCount ?? 0,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

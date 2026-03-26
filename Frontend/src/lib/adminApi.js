@@ -23,6 +23,9 @@ export const adminApi = {
   markNotificationRead: (id) =>
     axios.put(`${API_BASE}/notifications/read/${id}`, {}, { headers: getAuthHeaders() }),
 
+  markAllNotificationsRead: () =>
+    axios.put(`${API_BASE}/notifications/read-all`, {}, { headers: getAuthHeaders() }),
+
   getUsers: () =>
     axios.get(`${API_BASE}/users`, { headers: getAuthHeaders() }),
 

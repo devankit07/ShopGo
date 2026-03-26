@@ -123,6 +123,20 @@ export default function AdminLayout() {
     }
   };
 
+  const markAllAsRead = async () => {
+    if (unreadCount === 0) return;
+    try {
+      const res = await adminApi.markAllNotificationsRead();
+      if (res.data?.success) {
+        setNotifications((prev) =>
+          prev.map((item) => ({ ...item, isRead: true }))
+        );
+      }
+    } catch {
+      // keep silent
+    }
+  };
+
   return (
     <div className="min-h-screen md:flex bg-gray-50">
       <aside
@@ -191,11 +205,25 @@ export default function AdminLayout() {
 
             {showNotifications ? (
               <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-xl border border-gray-200 bg-white shadow-lg z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="font-semibold text-[#3E4152]">Notifications</p>
-                  <p className="text-xs text-gray-500">
-                    {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
-                  </p>
+                <div className="flex items-start justify-between gap-3 border-b border-gray-100 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-[#3E4152]">Notifications</p>
+                    <p className="text-xs text-gray-500">
+                      {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+                    </p>
+                  </div>
+                  {unreadCount > 0 ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAllAsRead();
+                      }}
+                      className="shrink-0 text-xs font-semibold text-[#fc8019] underline-offset-2 hover:underline"
+                    >
+                      Mark all as read
+                    </button>
+                  ) : null}
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (

@@ -58,7 +58,7 @@ export default function FeaturedProducts() {
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="h-80 rounded-3xl border border-white/10 bg-white/5 animate-pulse"
+                className="aspect-[3/4] rounded-3xl border border-white/10 bg-white/10 animate-pulse"
               />
             ))}
           </div>

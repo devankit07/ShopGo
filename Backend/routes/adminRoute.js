@@ -11,6 +11,7 @@ import {
   getActionLogs,
   getNotifications,
   markNotificationRead,
+  markAllNotificationsRead,
 } from "../controllers/adminController.js";
 import {
   addProduct,
@@ -28,6 +29,7 @@ router.get("/dashboard-stats", getDashboardStats);
 router.get("/analytics", getSalesAnalytics);
 router.get("/logs", getActionLogs);
 router.get("/notifications", getNotifications);
+router.put("/notifications/read-all", markAllNotificationsRead);
 router.put("/notifications/read/:id", markNotificationRead);
 
 router.get("/users", getAdminUsers);

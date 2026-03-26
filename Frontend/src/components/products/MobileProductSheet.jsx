@@ -58,6 +58,7 @@ function buildListQuery(filterParams) {
     maxPrice,
     brand,
     size,
+    minRating,
   } = filterParams;
   if (category && category !== "All") params.set("category", category);
   if (debouncedSearch) params.set("search", debouncedSearch);
@@ -68,6 +69,10 @@ function buildListQuery(filterParams) {
   if (maxN != null && !Number.isNaN(maxN) && maxN >= 0) params.set("maxPrice", String(maxN));
   if (brand?.trim()) params.set("brand", brand.trim());
   if (size) params.set("size", size);
+  const minR = minRating === "" || minRating == null ? null : Number(minRating);
+  if (minR != null && !Number.isNaN(minR) && minR > 0) {
+    params.set("minRating", String(minR));
+  }
   return params.toString();
 }
 

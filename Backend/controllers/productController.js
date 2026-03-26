@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import getDataUri from "../utils/dataUri.js";
 import Cloudinary from "../utils/cloudinary.js";
 import Product from "../models/productModel.js";
+import { Order } from "../models/orderModel.js";
 import cloudinary from "../utils/cloudinary.js";
 import { logAction } from "../utils/adminLog.js";
 
@@ -10,7 +12,7 @@ function escapeRegex(s) {
 
 export const addProduct = async (req, res) => {
   try {
-    const { productName, productDesc, productPrice, category, brand, size } =
+    const { productName, productDesc, productPrice, category, brand, size, rating } =
       req.body;
     const userId = req.id;
 
@@ -33,6 +35,12 @@ export const addProduct = async (req, res) => {
       }
     }
     //create a product in db
+    let ratingNum = 4.5;
+    if (rating !== undefined && rating !== "") {
+      const r = Number(rating);
+      if (!Number.isNaN(r)) ratingNum = Math.min(5, Math.max(0, r));
+    }
+
     const newProduct = await Product.create({
       userId,
       productName,
@@ -41,6 +49,7 @@ export const addProduct = async (req, res) => {
       category,
       brand,
       size: size || undefined,
+      rating: ratingNum,
       productImage, //array of objects [{url,punlic_id}]
     });
     if (req.id) await logAction(req.id, "Product added", productName, "product", newProduct._id);
@@ -97,6 +106,11 @@ export const getallproduct = async (req, res) => {
     const sortParam = (req.query.sort || "newest").toLowerCase();
     const brand = (req.query.brand || "").trim();
     const size = (req.query.size || "").trim();
+    const minRatingRaw = req.query.minRating;
+    const minRating =
+      minRatingRaw !== undefined && minRatingRaw !== ""
+        ? Number(minRatingRaw)
+        : null;
 
     const filter = {};
     if (category && category.toLowerCase() !== "all") {
@@ -130,6 +144,18 @@ export const getallproduct = async (req, res) => {
     }
     if (Object.keys(priceCond).length) {
       filter.productPrice = priceCond;
+    }
+
+    /* Minimum average rating; missing rating treated as 4.5 to match storefront default display */
+    if (
+      minRating != null &&
+      !Number.isNaN(minRating) &&
+      minRating > 0 &&
+      minRating <= 5
+    ) {
+      filter.$expr = {
+        $gte: [{ $ifNull: ["$rating", 4.5] }, minRating],
+      };
     }
 
     let sortObj = { createdAt: -1 };
@@ -177,9 +203,23 @@ export const getProductById = async (req, res) => {
         message: "Product not found",
       });
     }
+
+    let buyerCount = 0;
+    try {
+      const pid = new mongoose.Types.ObjectId(productId);
+      const uniqueBuyers = await Order.distinct("userId", {
+        "products.productId": pid,
+        orderStatus: { $ne: "Cancelled" },
+      });
+      buyerCount = uniqueBuyers.filter(Boolean).length;
+    } catch {
+      buyerCount = 0;
+    }
+
     return res.status(200).json({
       success: true,
       product,
+      buyerCount,
     });
   } catch (error) {
     return res.status(500).json({
@@ -229,6 +269,8 @@ export const updateProduct = async (req, res) => {
       productPrice,
       category,
       brand,
+      size,
+      rating,
       existingImages,
     } = req.body;
     const product = await Product.findById(productid);
@@ -279,6 +321,10 @@ export const updateProduct = async (req, res) => {
     product.category = category || product.category;
     product.brand = brand || product.brand;
     if (size !== undefined) product.size = size || undefined;
+    if (rating !== undefined && rating !== "") {
+      const r = Number(rating);
+      if (!Number.isNaN(r)) product.rating = Math.min(5, Math.max(0, r));
+    }
     product.productImage = UpdateImage;
     await product.save();
     if (req.id) await logAction(req.id, "Product updated", product.productName, "product", productid);

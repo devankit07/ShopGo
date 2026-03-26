@@ -16,6 +16,15 @@ const PRICE_PRESETS = [
   { label: "Above ₹10,000", min: "10000", max: "" },
 ];
 
+/** Minimum average rating (products with rating ≥ value). */
+const RATING_OPTIONS = [
+  { value: "", label: "Any rating" },
+  { value: "4", label: "4.0 & up" },
+  { value: "3", label: "3.0 & up" },
+  { value: "2", label: "2.0 & up" },
+  { value: "1", label: "1.0 & up" },
+];
+
 export default function ProductFiltersSidebar({
   categoryConfig = CATEGORY_CONFIG,
   isDesktopOpen,
@@ -33,6 +42,8 @@ export default function ProductFiltersSidebar({
   onBrandChange,
   size,
   onSizeChange,
+  minRating,
+  onMinRatingChange,
   onClearFilters,
   hasActiveFilters,
 }) {
@@ -114,6 +125,28 @@ export default function ProductFiltersSidebar({
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Rating */}
+        <div>
+          <label
+            htmlFor="product-rating"
+            className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#7E808C]"
+          >
+            Rating
+          </label>
+          <select
+            id="product-rating"
+            value={minRating}
+            onChange={(e) => onMinRatingChange(e.target.value)}
+            className="h-10 w-full rounded-xl border border-[#e9e9eb] bg-white px-3 text-sm text-[#282C3F] focus:border-[#fc8019] focus:outline-none focus:ring-2 focus:ring-[#fc8019]/25"
+          >
+            {RATING_OPTIONS.map((o) => (
+              <option key={o.value || "any"} value={o.value}>
                 {o.label}
               </option>
             ))}

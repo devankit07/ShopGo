@@ -70,17 +70,7 @@ export default function ProductGrid({
 
 function ProductCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-      <div className="aspect-[3/2] animate-pulse bg-muted" />
-      <div className="flex flex-col gap-0.5 p-2 pt-1.5">
-        <div className="h-3.5 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="h-3 w-full animate-pulse rounded bg-muted" />
-        <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-      </div>
-      <div className="p-2 pt-1">
-        <div className="h-7 w-full animate-pulse rounded-lg bg-muted" />
-      </div>
-    </div>
+    <div className="aspect-[3/4] overflow-hidden rounded-3xl bg-muted/40 shadow-md ring-1 ring-border/40 animate-pulse" />
   );
 }
 

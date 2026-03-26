@@ -7,6 +7,36 @@ import {
   openRazorpayCheckout,
   resolveRazorpayKeyId,
 } from "@/lib/razorpay";
+import { buildFailedQueryString } from "@/lib/paymentFailure";
+
+function navigateToFailed(navigate, payload) {
+  const qs = buildFailedQueryString(payload);
+  navigate(qs ? `/failed?${qs}` : "/failed");
+}
+
+function toastForCheckoutFailure(payload) {
+  if (!payload?.reason) {
+    toast.error("Payment could not be completed.");
+    return;
+  }
+  switch (payload.reason) {
+    case "user_closed":
+      toast.info("You closed the payment window before completing checkout.");
+      break;
+    case "payment_failed":
+      toast.error(
+        payload.description ||
+          payload.message ||
+          "Payment was declined or could not be completed."
+      );
+      break;
+    case "config":
+      toast.error(payload.message || "Payment setup error.");
+      break;
+    default:
+      toast.error(payload.message || payload.description || "Payment failed.");
+  }
+}
 
 export const useRazorpayPayment = () => {
   const navigate = useNavigate();
@@ -53,27 +83,38 @@ export const useRazorpayPayment = () => {
             if (paymentId) {
               navigate(`/success?payment_id=${paymentId}`);
             } else {
-              navigate("/failed");
+              toast.error("No payment confirmation received.");
+              navigateToFailed(navigate, { reason: "no_payment_id" });
             }
           } catch (error) {
             toast.error(
               error?.message || "Payment succeeded but order could not be saved."
             );
-            navigate("/failed");
+            navigateToFailed(navigate, {
+              reason: "order_save",
+              detail: error?.message,
+            });
           } finally {
             setIsPaying(false);
           }
         },
-        onFailure: () => {
+        onFailure: (payload) => {
           setIsPaying(false);
-          toast.error("Payment cancelled");
-          navigate("/failed");
+          toastForCheckoutFailure(payload || { reason: "unknown" });
+          navigateToFailed(navigate, payload || { reason: "unknown" });
         },
       });
     } catch (error) {
       setIsPaying(false);
-      toast.error(error?.message || "Payment initialization failed.");
-      navigate("/failed");
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Payment initialization failed.";
+      toast.error(msg);
+      navigateToFailed(navigate, {
+        reason: "init_error",
+        detail: msg,
+      });
     }
   };
 

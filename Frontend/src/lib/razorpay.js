@@ -81,9 +81,19 @@ export const openRazorpayCheckout = ({
   description = "Order payment",
 }) => {
   if (!key) {
-    onFailure?.();
+    onFailure?.({
+      reason: "config",
+      message: "Razorpay checkout key is missing.",
+    });
     return;
   }
+
+  let failureHandled = false;
+  const notifyFailure = (payload) => {
+    if (failureHandled) return;
+    failureHandled = true;
+    onFailure?.(payload);
+  };
 
   const options = {
     key,
@@ -98,7 +108,9 @@ export const openRazorpayCheckout = ({
       });
     },
     modal: {
-      ondismiss: onFailure,
+      ondismiss: () => {
+        notifyFailure({ reason: "user_closed" });
+      },
     },
     theme: {
       color: "#FC8019",
@@ -106,6 +118,15 @@ export const openRazorpayCheckout = ({
   };
 
   const razorpayInstance = new window.Razorpay(options);
-  razorpayInstance.on("payment.failed", onFailure);
+  razorpayInstance.on("payment.failed", (response) => {
+    const err = response?.error || {};
+    notifyFailure({
+      reason: "payment_failed",
+      code: err.code,
+      description: err.description,
+      source: err.source,
+      step: err.step,
+    });
+  });
   razorpayInstance.open();
 };

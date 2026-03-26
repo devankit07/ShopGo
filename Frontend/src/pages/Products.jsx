@@ -25,6 +25,7 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState("");
   const [brand, setBrand] = useState("");
   const [size, setSize] = useState("");
+  const [minRating, setMinRating] = useState("");
   const [mobileSheetProduct, setMobileSheetProduct] = useState(null);
   const [categoryConfig, setCategoryConfig] = useState(() =>
     mergeCategoryConfigForStorefront([])
@@ -83,7 +84,7 @@ export default function Products() {
 
   useEffect(() => {
     setPage(1);
-  }, [category, debouncedSearch, sort, minPrice, maxPrice, brand, size]);
+  }, [category, debouncedSearch, sort, minPrice, maxPrice, brand, size, minRating]);
 
   const fetchProducts = useCallback(() => {
     setLoading(true);
@@ -99,6 +100,10 @@ export default function Products() {
     if (maxN != null && !Number.isNaN(maxN) && maxN >= 0) params.set("maxPrice", String(maxN));
     if (brand.trim()) params.set("brand", brand.trim());
     if (size) params.set("size", size);
+    const minR = minRating === "" ? null : Number(minRating);
+    if (minR != null && !Number.isNaN(minR) && minR > 0) {
+      params.set("minRating", String(minR));
+    }
 
     axios
       .get(`${API_BASE}/api/products?${params.toString()}`)
@@ -121,7 +126,7 @@ export default function Products() {
       .finally(() => {
         setLoading(false);
       });
-  }, [page, category, perPage, debouncedSearch, sort, minPrice, maxPrice, brand, size]);
+  }, [page, category, perPage, debouncedSearch, sort, minPrice, maxPrice, brand, size, minRating]);
 
   useEffect(() => {
     fetchProducts();
@@ -140,8 +145,9 @@ export default function Products() {
       maxPrice,
       brand,
       size,
+      minRating,
     }),
-    [category, debouncedSearch, sort, minPrice, maxPrice, brand, size]
+    [category, debouncedSearch, sort, minPrice, maxPrice, brand, size, minRating]
   );
 
   const handleCategoryChange = (newCategory) => {
@@ -162,9 +168,10 @@ export default function Products() {
       maxPrice !== "" ||
       brand.trim() !== "" ||
       size !== "" ||
+      minRating !== "" ||
       category !== "All"
     );
-  }, [debouncedSearch, sort, minPrice, maxPrice, brand, size, category]);
+  }, [debouncedSearch, sort, minPrice, maxPrice, brand, size, minRating, category]);
 
   const clearFilters = () => {
     setCategory("All");
@@ -175,20 +182,22 @@ export default function Products() {
     setMaxPrice("");
     setBrand("");
     setSize("");
+    setMinRating("");
     setPage(1);
   };
 
   const emptyMessage = useMemo(() => {
-    if (debouncedSearch || brand || minPrice || maxPrice || size) {
+    if (debouncedSearch || brand || minPrice || maxPrice || size || minRating) {
       return "No products match your filters. Try adjusting search or filters.";
     }
     if (category === "All") return "No products available yet.";
     return `No products in ${category}.`;
-  }, [debouncedSearch, brand, minPrice, maxPrice, size, category]);
+  }, [debouncedSearch, brand, minPrice, maxPrice, size, minRating, category]);
 
   return (
     <>
-      <main className="min-h-screen bg-[#f8f8f8] pt-24 pb-16">
+      {/* Single <main> is the App route wrapper; keep this as a div to avoid nested mains. */}
+      <div className="min-h-screen bg-[#f8f8f8] pt-28 pb-20 md:pb-16 lg:pt-32">
         <CartThresholdPromoListener />
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h1 className="mb-6 text-2xl font-bold text-[#282C3F] sm:mb-8 sm:text-3xl">
@@ -196,7 +205,7 @@ export default function Products() {
           </h1>
 
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
-            <aside className="shrink-0 lg:sticky lg:top-24 lg:w-72 lg:self-start xl:w-80">
+            <aside className="shrink-0 lg:sticky lg:top-32 lg:w-72 lg:self-start xl:w-80">
               <h2 className="mb-3 hidden text-lg font-bold text-[#282C3F] lg:block">
                 Filters
               </h2>
@@ -216,6 +225,8 @@ export default function Products() {
                 onBrandChange={setBrand}
                 size={size}
                 onSizeChange={setSize}
+                minRating={minRating}
+                onMinRatingChange={setMinRating}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
               />
@@ -246,7 +257,7 @@ export default function Products() {
             filterParams={mobileFilterParams}
           />
         ) : null}
-      </main>
+      </div>
       <FeaturedServices />
       <DealsBanner bannerText="SHOP NOW" />
       <Footer />

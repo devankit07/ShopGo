@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { ArrowLeft, ShoppingCart, Star } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addToCart } from "@/redux/cartSlice";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [product, setProduct] = useState(null);
+  const [buyerCount, setBuyerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(PLACEHOLDER_IMG);
@@ -34,8 +35,13 @@ export default function ProductDetail() {
       .then((res) => {
         if (res.data?.product) setProduct(res.data.product);
         else setProduct(null);
+        const n = res.data?.buyerCount;
+        setBuyerCount(typeof n === "number" && !Number.isNaN(n) ? n : 0);
       })
-      .catch(() => setProduct(null))
+      .catch(() => {
+        setProduct(null);
+        setBuyerCount(0);
+      })
       .finally(() => setLoading(false));
   }, [productId]);
 
@@ -189,6 +195,21 @@ export default function ProductDetail() {
             <div className="mt-2 flex flex-wrap gap-2 text-sm">
               <span className="text-[#7E808C]">Availability:</span>
               <span className="font-medium text-emerald-600">In Stock</span>
+            </div>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+              <Users
+                className="size-4 shrink-0 text-[#7E808C]"
+                strokeWidth={2}
+                aria-hidden
+              />
+              <span className="text-[#7E808C]">Purchased by</span>
+              <span className="font-semibold text-[#282C3F] tabular-nums">
+                {buyerCount.toLocaleString()}
+              </span>
+              <span className="text-[#7E808C]">
+                {buyerCount === 1 ? "person" : "people"}
+              </span>
             </div>
 
             <p className="mt-6 leading-relaxed text-[#3d4152]">
