@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import ThresholdPromoBar from "@/components/ui/ThresholdPromoBar";
 import { CART_RULES, MAXCART_RULES } from "@/components/cart/cartConstants";
+import { getAccessToken } from "@/lib/authStorage";
 
 const SESSION_KEY = "shopgo_guest_home_threshold_promo_v1";
 
@@ -18,7 +19,7 @@ export default function GuestHomeThresholdBanner() {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem("accesstoken")) return;
+      if (getAccessToken()) return;
       if (sessionStorage.getItem(SESSION_KEY)) return;
       sessionStorage.setItem(SESSION_KEY, "1");
     } catch {

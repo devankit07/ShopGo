@@ -1,9 +1,10 @@
 import axios from "axios";
+import { getAccessToken } from "@/lib/authStorage";
 
 const API_BASE = "/api/admin";
 
 function getAuthHeaders() {
-  const token = localStorage.getItem("accesstoken");
+  const token = getAccessToken();
   return { Authorization: token ? `Bearer ${token}` : "" };
 }
 

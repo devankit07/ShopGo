@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getAccessToken } from "@/lib/authStorage";
 
 const STATIC_CATEGORIES = PRODUCT_CATEGORIES.filter((c) => c !== "All");
 const PAGE_SIZE = 6;
@@ -15,7 +16,7 @@ const PAGE_SIZE = 6;
 const API_BASE = "/api/admin";
 
 function getAuthHeaders() {
-  const token = localStorage.getItem("accesstoken");
+  const token = getAccessToken();
   return { Authorization: token ? `Bearer ${token}` : "" };
 }
 
@@ -319,7 +320,7 @@ function ProductFormModal({ modal, onClose, onSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accesstoken");
+    const token = getAccessToken();
     if (!token) return;
 
     const categoryValue = useNewCategory

@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import OrderTable from "./OrderTable";
 import OrderCard from "./OrderCard";
 import axios from "axios";
+import { getAccessToken } from "@/lib/authStorage";
 
 const API_BASE = "/api/v1";
 
@@ -24,7 +25,7 @@ export default function OrdersSection({ userId }) {
       setLoading(false);
       return;
     }
-    const token = localStorage.getItem("accesstoken");
+    const token = getAccessToken();
     if (!token) {
       setLoading(false);
       return;

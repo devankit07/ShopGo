@@ -1,14 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
-const getStoredUser = () => {
-  try {
-    const rawUser = localStorage.getItem("user");
-    return rawUser ? JSON.parse(rawUser) : null;
-  } catch {
-    return null;
-  }
-};
+import { getStoredUser } from "@/lib/authStorage";
 
 const AdminRoute = ({ children }) => {
   const reduxUser = useSelector((state) => state.User?.user);

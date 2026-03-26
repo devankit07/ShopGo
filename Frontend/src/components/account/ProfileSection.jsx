@@ -15,6 +15,7 @@ import userlogo from "../../assets/user-icon.webp";
 import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/userslice";
+import { getAccessToken, getStoredUser, setStoredUser } from "@/lib/authStorage";
 
 const API_BASE = "/api/v1";
 
@@ -41,7 +42,7 @@ export default function ProfileSection({ userId }) {
   useEffect(() => {
     if (!userId) {
       setFetching(false);
-      const saved = JSON.parse(localStorage.getItem("user") || "{}");
+      const saved = getStoredUser() || {};
       if (saved?._id) {
         setUpdateUser({
           firstName: saved.firstName ?? "",
@@ -57,10 +58,10 @@ export default function ProfileSection({ userId }) {
       }
       return;
     }
-    const token = localStorage.getItem("accesstoken");
+    const token = getAccessToken();
     if (!token) {
       setFetching(false);
-      const saved = JSON.parse(localStorage.getItem("user") || "{}");
+      const saved = getStoredUser() || {};
       if (saved?._id) {
         setUpdateUser({
           firstName: saved.firstName ?? "",
@@ -95,11 +96,11 @@ export default function ProfileSection({ userId }) {
             profilePic: u.profilePic ?? "",
           });
           dispatch(setUser(res.data.user));
-          localStorage.setItem("user", JSON.stringify(res.data.user));
+          setStoredUser(res.data.user);
         }
       })
       .catch(() => {
-        const saved = JSON.parse(localStorage.getItem("user") || "{}");
+        const saved = getStoredUser() || {};
         if (saved?._id) {
           setUpdateUser({
             firstName: saved.firstName ?? "",
@@ -135,7 +136,7 @@ export default function ProfileSection({ userId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const token = localStorage.getItem("accesstoken");
+    const token = getAccessToken();
     try {
       const formData = new FormData();
       formData.append("firstName", updateUser.firstName);
@@ -173,7 +174,7 @@ export default function ProfileSection({ userId }) {
           profilePic: u.profilePic ?? prev.profilePic,
         }));
         dispatch(setUser(res.data.user));
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setStoredUser(res.data.user);
         setFile(null);
       }
     } catch (err) {

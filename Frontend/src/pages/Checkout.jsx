@@ -13,6 +13,7 @@ import { selectCartItems, removeFromCart } from "@/redux/cartSlice";
 import { markFirstOrderCompleted } from "@/components/cart/firstOrderStorage";
 import { Loader2, ShieldCheck, Banknote, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAccessToken } from "@/lib/authStorage";
 
 const API_BASE = "/api/v1";
 
@@ -38,7 +39,7 @@ function CheckoutInner() {
 
   const token =
     typeof window !== "undefined"
-      ? localStorage.getItem("accesstoken")
+      ? getAccessToken()
       : null;
 
   const handlePay = async () => {
@@ -276,7 +277,7 @@ export default function Checkout() {
 
   const token =
     typeof window !== "undefined"
-      ? localStorage.getItem("accesstoken")
+      ? getAccessToken()
       : null;
   const isLoggedIn = Boolean(token);
   const userId = user?._id;

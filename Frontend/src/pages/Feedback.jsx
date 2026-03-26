@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import DarkMeshBackdrop from "@/components/ui/DarkMeshBackdrop";
+import { getAccessToken } from "@/lib/authStorage";
 
 const API_BASE = "/api/v1";
 
 export default function Feedback() {
   const { user } = useSelector((state) => state.User);
-  const token = localStorage.getItem("accesstoken");
+  const token = getAccessToken();
 
   const [list, setList] = useState([]);
   const [loadingList, setLoadingList] = useState(false);

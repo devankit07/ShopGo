@@ -17,6 +17,7 @@ import CouponSection from "@/components/cart/CouponSection";
 import UnlockProgressBar from "@/components/cart/UnlockProgressBar";
 import PriceSummary from "@/components/cart/PriceSummary";
 import { getRemainingAmount } from "@/components/cart/cartDiscount";
+import { getAccessToken } from "@/lib/authStorage";
 const scriptFont = { fontFamily: "'Caveat', cursive" };
 
 /** Line-art mascot peeking over a shelf (empty-state illustration). */
@@ -158,7 +159,7 @@ export default function Cart() {
 
   const token =
     typeof window !== "undefined"
-      ? localStorage.getItem("accesstoken")
+      ? getAccessToken()
       : null;
   const isLoggedIn = Boolean(token);
   const userId = user?._id;

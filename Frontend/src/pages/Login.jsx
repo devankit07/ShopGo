@@ -16,6 +16,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
+import { setAccessToken, setRefreshToken, setStoredUser } from "@/lib/authStorage";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +36,9 @@ const Login = () => {
       setLoading(true);
       const res = await axios.post("/api/v1/user/login", formData);
       if (res.data.success) {
-        localStorage.setItem("accesstoken", res.data.accesstoken);
+        setAccessToken(res.data.accesstoken);
+        setRefreshToken(res.data.refreshtoken);
+        setStoredUser(res.data.user);
         dispatch(setUser(res.data.user));
         toast.success(res.data.message);
         if (res.data.user?.role === "admin") {

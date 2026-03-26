@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import { selectCartCount } from "@/redux/cartSlice";
 import MobileBottomNav from "./MobileBottomNav";
+import { clearAuthStorage, getAccessToken } from "@/lib/authStorage";
 
 const BRAND_LOGO = (
   <img
@@ -24,7 +25,7 @@ const Navbar = () => {
   const cartCount = useSelector(selectCartCount);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const accesstoken = localStorage.getItem("accesstoken");
+  const accesstoken = getAccessToken();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -47,9 +48,7 @@ const Navbar = () => {
       );
       if (response.data.success) {
         dispatch(setUser(null));
-        localStorage.removeItem("user");
-        localStorage.removeItem("accesstoken");
-        localStorage.removeItem("refreshtoken");
+        clearAuthStorage();
         toast.success(response.data.message);
       }
     } catch (error) {

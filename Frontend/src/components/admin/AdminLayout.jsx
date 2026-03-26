@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/userslice";
 import axios from "axios";
 import { adminApi } from "@/lib/adminApi";
+import { clearAuthStorage, getAccessToken } from "@/lib/authStorage";
 
 const BrandLogo = () => (
   <Link to="/" className="inline-block">
@@ -45,12 +46,10 @@ export default function AdminLayout() {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem("accesstoken");
+      const token = getAccessToken();
       await axios.post("/api/v1/user/logout", {}, { headers: { Authorization: `Bearer ${token}` } });
       dispatch(setUser(null));
-      localStorage.removeItem("user");
-      localStorage.removeItem("accesstoken");
-      localStorage.removeItem("refreshtoken");
+      clearAuthStorage();
       navigate("/login");
     } catch (_) {}
   };

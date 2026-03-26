@@ -5,6 +5,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import DarkMeshBackdrop from "@/components/ui/DarkMeshBackdrop";
+import { getAccessToken } from "@/lib/authStorage";
 
 const API_BASE = "/api/v1";
 
@@ -13,7 +14,7 @@ const inputClass =
 
 export default function GiveFeedback() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("accesstoken");
+  const token = getAccessToken();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
     name: "",
